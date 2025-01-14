@@ -18,6 +18,7 @@ NICE_NAMES = {
 }
 YEAR = 2019
 NETWORKS = "./data/networks/"
+FONTSIZE = 12
 
 
 class ResultsAccessor:
@@ -47,7 +48,7 @@ class ResultsAccessor:
         elif input == "ramping":
             raise NotImplementedError
         elif input == "shed_season":
-            raise NotImplementedError
+            return SheadSeason(self.n)
         elif input == "shed_days":
             raise NotImplementedError
         elif input == "shift_season":
@@ -80,7 +81,7 @@ class ResultsExtractor(ABC):
         pass
 
     @abstractmethod
-    def extract_datapoint() -> float:
+    def extract_datapoint() -> int | float | tuple[datetime, datetime]:
         pass
 
     @abstractmethod
@@ -133,26 +134,28 @@ class Peakiness(ResultsExtractor):
 
     def __init__(self, n):
         super().__init__(n)
-        self.df = self.get_net_load(sorted=True)
+        self.net_load = self.get_net_load(sorted=True)
 
     def extract_dataframe(self):
-        return self.df
+        return self.net_load
 
     def extract_datapoint(self):
-        peak_0 = self.df.at[0, "Net_Load_MW"]
-        peak_100 = self.df.at[99, "Net_Load_MW"]
+        peak_0 = self.net_load.at[0, "Net_Load_MW"]
+        peak_100 = self.net_load.at[99, "Net_Load_MW"]
         return round(peak_0 - peak_100, 2)
 
     def plot(self, save: Optional[str] = None, **kwargs):
 
-        peak_0 = self.df.at[0, "Net_Load_MW"]
-        peak_100 = self.df.at[99, "Net_Load_MW"]
-        date_0 = self.df.at[0, "timestep"]
-        date_100 = self.df.at[99, "timestep"]
+        peak_0 = self.net_load.at[0, "Net_Load_MW"]
+        peak_100 = self.net_load.at[99, "Net_Load_MW"]
+        date_0 = self.net_load.at[0, "timestep"]
+        date_100 = self.net_load.at[99, "timestep"]
 
-        net_load = self.get_net_load(sorted=False)
+        load_ts = self.get_net_load(sorted=False)
 
-        df = net_load[["Net_Load_MW"]].rename(columns={"Net_Load_MW": "Net Load"})
+        df = load_ts.set_index("timestep")[["Net_Load_MW"]].rename(
+            columns={"Net_Load_MW": "Net Load"}
+        )
         df["Peak Net Load"] = peak_0
         df["100th Highest Peak Load"] = peak_100
 
@@ -165,10 +168,10 @@ class Peakiness(ResultsExtractor):
                 continue
             line.set_label("")
 
-        ax.set_ylabel("Net Load", fontsize=12)
+        ax.set_ylabel("Net Load", fontsize=FONTSIZE)
         ax.margins(x=0.01)
-        ax.legend(fontsize=15)
-        ax.set_ylim((0, peak_0 + 5000))
+        ax.legend(fontsize=FONTSIZE)
+        # ax.set_ylim((0, peak_0 + 5000))
 
         # ax.text(datetime.datetime(YEAR,1,1), 38000, "100th Highest Peak Net Load", fontsize=15)
         # ax.text(datetime.datetime(YEAR,1,1), 49000, "Peak Net Load", fontsize=15)
@@ -186,13 +189,122 @@ class Peakiness(ResultsExtractor):
                 linewidth=1.25,
             ),
         )
-        ax.text(datetime(YEAR, 2, 4), peak_0 - 3200, "Peakiness", fontsize=15)
+        ax.text(datetime(YEAR, 2, 4), peak_0 - 3200, "Peakiness", fontsize=FONTSIZE)
 
-        # ax.plot(date_0, peak_0, "o", color="k", markersize=5)
-        # ax.text(date_0, peak_0 + 2000, "Peak", fontsize=15)
+        ax.scatter(date_0, peak_0, color="k", s=25, zorder=9)
+        ax.text(date_0, peak_0 + 2000, "Peak", fontsize=FONTSIZE)
 
         if save:
-            fig.savefig(save, dpi=400)
+            fig.savefig(save, dpi=400, bbox_inches="tight")
+
+        return fig, ax
+
+
+class SheadSeason(ResultsExtractor):
+
+    def __init__(self, n):
+        super().__init__(n)
+        self.net_load = self.get_net_load(sorted=True)
+
+    def extract_dataframe(self) -> pd.DataFrame:
+        df = self.net_load.copy()
+        df = self._time_between_peaks(df)
+        return self._get_season(df)
+
+    def extract_datapoint(self) -> tuple[datetime, datetime]:
+        df = self.extract_dataframe()
+        first_day = df.at[0, "timestep"]
+        last_day = df.at[len(df) - 1, "timestep"]
+        return (first_day, last_day)
+
+    @staticmethod
+    def _time_between_peaks(net_load: pd.DataFrame) -> pd.DataFrame:
+        """Gets time between top 100 loads"""
+
+        df = net_load.copy()
+
+        df_times = df.iloc[:101, :].copy()  # keep end point
+        df_times = df_times.sort_values("timestep").reset_index(drop=True)
+
+        diff = []
+        for row in range(len(df_times)):
+            try:
+                start = df_times.loc[row, "timestep"]
+                end = df_times.loc[row + 1, "timestep"]
+                diff.append(end - start)
+            except KeyError:
+                pass
+        df_times = df_times.iloc[:100, :]  # remove end point
+        df_times["diff"] = diff
+
+        df_times["Top 100 Net-Load Hours"] = net_load.at[99, "Net_Load_MW"]
+
+        return df_times
+
+    @staticmethod
+    def _get_season(df_times: pd.DataFrame) -> pd.DataFrame:
+        """Gets chortest span containing at least 80 days"""
+
+        load_shortest = df_times.copy()
+
+        while len(load_shortest) > 80:
+            start_diff = load_shortest["diff"].iloc[0]
+            end_diff = load_shortest["diff"].iloc[-1]
+            if start_diff > end_diff:
+                load_shortest = load_shortest.iloc[1:, :]
+            else:
+                load_shortest = load_shortest.iloc[:-1, :]
+            load_shortest = load_shortest.reset_index(drop=True)
+
+        return load_shortest
+
+    def plot(self, save: Optional[str] = None, **kwargs) -> tuple[plt.figure, plt.axes]:
+
+        net_load_sorted = self.net_load
+        top_100 = net_load_sorted.at[100, "Net_Load_MW"]
+
+        net_load_unsorted = self.get_net_load(sorted=False)
+        net_load_unsorted["Top 100 Net Load Hours"] = top_100
+
+        df = net_load_unsorted.set_index("timestep")[
+            ["Net_Load_MW", "Top 100 Net Load Hours"]
+        ].rename(columns={"Net_Load_MW": "Net Load"})
+
+        dates = self.extract_datapoint()
+
+        fig, ax = plt.subplots(figsize=(20, 6))
+        df.plot(ax=ax, xlabel="", color=["tab:blue", "tab:red"])
+        ax.set_ylabel("Net Load (MW)", fontsize=FONTSIZE)
+        ax.margins(x=0.01)
+        ax.legend(fontsize=FONTSIZE)
+        ax.text(
+            datetime(YEAR, 1, 7),
+            top_100 + 2000,
+            "Highest Probability Demand Response Events",
+            fontsize=FONTSIZE,
+        )
+
+        mid_date = dates[0] + ((dates[1] - dates[0]) / 2)
+
+        ax.text(mid_date, 1500, "Demand Response Shed Season", fontsize=13)
+        ax.annotate(
+            text="",
+            xy=(dates[0], 5000),
+            xytext=(dates[1], 5000),
+            arrowprops=dict(
+                arrowstyle="<|-|>",
+                mutation_scale=20,
+                mutation_aspect=0.75,
+                color="k",
+                fill=True,
+                linewidth=1.25,
+            ),
+        )
+        ax.axvline(x=dates[0], color="k", linestyle="-", linewidth=3)
+        ax.axvline(x=dates[1], color="k", linestyle="-", linewidth=3)
+
+        if save:
+            fig.savefig(save, dpi=400, bbox_inches="tight")
 
         return fig, ax
 
@@ -203,4 +315,5 @@ if __name__ == "__main__":
 
     ra = ResultsAccessor(NETWORKS + network)
 
-    ra.plot("peakiness", save="test.png")
+    # print(ra.get_datapoint("shed_season"))
+    ra.plot("shed_season", save="test.png")
