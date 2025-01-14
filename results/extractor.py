@@ -1,9 +1,9 @@
-
 from abc import ABC, abstractmethod
 import pandas as pd
 from typing import Optional, Any
 import matplotlib.pyplot as plt
 import pypsa
+
 
 class ResultsExtractor(ABC):
 
@@ -12,7 +12,7 @@ class ResultsExtractor(ABC):
     def __init__(self, n: pypsa.Network, year: Optional[int] = None):
         self.n = n
         self._year = year
-        
+
     @property
     def year(self):
         return self._year
@@ -26,12 +26,11 @@ class ResultsExtractor(ABC):
         pass
 
     @abstractmethod
-    def plot(
-        save: Optional[str] = None, **kwargs
-    ) -> tuple[plt.figure, plt.axes]:
+    def plot(save: Optional[str] = None, **kwargs) -> tuple[plt.figure, plt.axes]:
         pass
 
     def get_net_load(self, sorted: Optional[bool] = True) -> pd.DataFrame:
+        """Gets base net load dataframe"""
 
         loads = self._get_electical_load()
         solar = self._get_renewable_generation("solar")
@@ -45,6 +44,30 @@ class ResultsExtractor(ABC):
             return df.sort_values("Net_Load_MW", ascending=False).reset_index(drop=True)
         else:
             return df
+
+    def get_ramping(self) -> pd.DataFrame:
+        """Gets base ramping dataframe"""
+
+        net_load = self.get_net_load(sorted=False)
+
+        ramp = (
+            net_load[["timestep", "Net_Load_MW"]]
+            .set_index("timestep")
+            .rename(columns={"Net_Load_MW": f"Absolute 3-hr Ramping"})
+            .copy()
+        )
+        ramp = ramp.diff(periods=3)
+        ramp[f"Absolute 3-hr Ramping"] = ramp[f"Absolute 3-hr Ramping"].abs()
+        ramp["Net Load"] = net_load.set_index("timestep")["Net_Load_MW"]
+        return ramp.dropna().reset_index(drop=False)
+
+    def get_daily_max_ramp(self) -> pd.DataFrame:
+        """Gets maximum ramping for each day in the year"""
+
+        ramp = self.get_ramping()
+        max_ramp = ramp.sort_values(by=["Absolute 3-hr Ramping"], ascending=False)
+        max_ramp["day"] = max_ramp["timestep"].map(lambda x: f"{x.month}-{x.day}")
+        return max_ramp.drop_duplicates("day").reset_index(drop=True)
 
     def _get_electical_load(self) -> pd.DataFrame:
         buses = self.n.links[
