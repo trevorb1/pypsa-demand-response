@@ -16,10 +16,16 @@ class Peakiness(ResultsExtractor):
     def extract_dataframe(self) -> pd.DataFrame:
         return self.net_load
 
-    def extract_datapoint(self) -> float:
+    def extract_datapoint(self, value: Optional[str] = None) -> float:
         peak_0 = self.net_load.at[0, "Net_Load_MW"]
         peak_100 = self.net_load.at[99, "Net_Load_MW"]
-        return round(peak_0 - peak_100, 2)
+        
+        if value == "peak": 
+            return round(peak_0, 2)
+        elif value == "routine":
+            return round(peak_100, 2)
+        else:
+            return round(peak_0 - peak_100, 2)
 
     def plot(self, save: Optional[str] = None, **kwargs):
 
@@ -51,10 +57,6 @@ class Peakiness(ResultsExtractor):
         ax.set_ylabel("Net Load", fontsize=fontsize)
         ax.margins(x=0.01)
         ax.legend(fontsize=fontsize)
-        # ax.set_ylim((0, peak_0 + 5000))
-
-        # ax.text(datetime.datetime(YEAR,1,1), 38000, "100th Highest Peak Net Load", fontsize=15)
-        # ax.text(datetime.datetime(YEAR,1,1), 49000, "Peak Net Load", fontsize=15)
 
         ax.annotate(
             text="",

@@ -9,6 +9,7 @@ from extractor import ResultsExtractor
 from peakiness import Peakiness
 from shed_season import ShedSeason
 from shed_days import ShedDays
+from ramping import Ramping
 
 NICE_NAMES = {
     "res": "Residential",
@@ -35,6 +36,7 @@ class ResultsAccessor:
             "shed_season",
             "shed_days",
             "shift_season",
+            "shift_days",
         ]:
             return True
         else:
@@ -47,12 +49,14 @@ class ResultsAccessor:
         if input == "peakiness":
             return Peakiness(self.n, YEAR)
         elif input == "ramping":
-            raise NotImplementedError
+            return Ramping(self.n, YEAR)
         elif input == "shed_season":
             return ShedSeason(self.n, YEAR)
         elif input == "shed_days":
             return ShedDays(self.n, YEAR)
         elif input == "shift_season":
+            raise NotImplementedError
+        elif input == "shift_days":
             raise NotImplementedError
         else:
             raise NotImplementedError
@@ -80,5 +84,6 @@ if __name__ == "__main__":
 
     ra = ResultsAccessor(NETWORKS + network)
 
-    # print(ra.get_dataframe("shed_days"))
-    ra.plot("shed_days", save="test.png")
+    # print(ra.get_dataframe("ramping"))
+    # print(ra._get_extractor("ramping").get_daily_max_ramp())
+    ra.plot("ramping", save="test.png")
