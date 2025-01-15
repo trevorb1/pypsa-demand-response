@@ -10,6 +10,7 @@ from peakiness import Peakiness
 from shed_season import ShedSeason
 from shed_days import ShedDays
 from ramping import Ramping
+from shift_season import ShiftSeason
 
 NICE_NAMES = {
     "res": "Residential",
@@ -55,7 +56,7 @@ class ResultsAccessor:
         elif input == "shed_days":
             return ShedDays(self.n, YEAR)
         elif input == "shift_season":
-            raise NotImplementedError
+            return ShiftSeason(self.n, YEAR)
         elif input == "shift_days":
             raise NotImplementedError
         else:
@@ -86,4 +87,4 @@ if __name__ == "__main__":
 
     # print(ra.get_dataframe("ramping"))
     # print(ra._get_extractor("ramping").get_daily_max_ramp())
-    ra.plot("ramping", save="test.png")
+    ra.plot("shift_season", save="test.png")

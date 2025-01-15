@@ -11,15 +11,14 @@ class Ramping(ResultsExtractor):
 
     def __init__(self, n, year=None):
         super().__init__(n, year)
-        self.ramp_ts = self.get_ramping()
-        self.ramp_daily = self.get_daily_max_ramp()
+        self.ramp_ts = self.get_daily_max_ramp()
 
     def extract_dataframe(self) -> pd.DataFrame:
         return self.ramp_ts.copy()
 
     def extract_datapoint(self, value: Optional[str] = None) -> float:
-        peak_0 = self.ramp_daily.at[0, "Absolute 3-hr Ramping"]
-        peak_25 = self.ramp_daily.at[24, "Absolute 3-hr Ramping"]
+        peak_0 = self.ramp_ts.at[0, "Absolute 3-hr Ramping"]
+        peak_25 = self.ramp_ts.at[24, "Absolute 3-hr Ramping"]
 
         if value == "peak":
             return round(peak_0, 2)
@@ -33,7 +32,7 @@ class Ramping(ResultsExtractor):
         fontsize = kwargs.get("fontsize", 12)
         figsize = kwargs.get("figsize", (20, 6))
 
-        ramp_daily_ts = self.ramp_daily.sort_values(by="timestep").copy()
+        ramp_daily_ts = self.ramp_ts.sort_values(by="timestep").copy()
         ramp_max = ramp_daily_ts.at[0, "Absolute 3-hr Ramping"]
         ramp_rountine = ramp_daily_ts.at[24, "Absolute 3-hr Ramping"]
 
