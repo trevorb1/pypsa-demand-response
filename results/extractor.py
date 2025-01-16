@@ -22,7 +22,8 @@ class ResultsExtractor(ABC):
         pass
 
     @abstractmethod
-    def extract_datapoint() -> Any:
+    def extract_datapoint(as_df: Optional[bool] = False) -> Any:
+        """Return as df for standardized output"""
         pass
 
     @abstractmethod

@@ -18,11 +18,21 @@ class ShiftSeason(ResultsExtractor):
         df = self._time_between_peaks(df)
         return self._get_season(df)
 
-    def extract_datapoint(self) -> tuple[datetime, datetime]:
+    def extract_datapoint(self, as_df: Optional[bool] = False) -> tuple[datetime, datetime] | pd.DataFrame:
         df = self.extract_dataframe()
         first_day = df.at[0, "timestep"].to_pydatetime()
         last_day = df.at[len(df) - 1, "timestep"].to_pydatetime()
-        return (first_day, last_day)
+        if as_df:
+            df = pd.DataFrame(
+                [
+                    ["first_day", first_day],
+                    ["last_day", last_day],
+                ], 
+                columns=["metric", "value"]
+            )
+            return df
+        else:
+            return (first_day, last_day)
 
     @staticmethod
     def _time_between_peaks(daily_ramp: pd.DataFrame) -> pd.DataFrame:

@@ -24,9 +24,16 @@ class ShedDays(ResultsExtractor):
         days_in_top_100 = self._get_days_in_top_100()
         return self._date_in_season(shed_season, days_in_top_100)
 
-    def extract_datapoint(self) -> list[datetime]:
+    def extract_datapoint(
+        self, as_df: Optional[bool] = False
+    ) -> list[datetime] | pd.DataFrame:
         df = self.extract_dataframe()
-        return df["day"].unique().tolist()
+        days = df["day"].unique().tolist()
+
+        if as_df:
+            return pd.DataFrame(days, columns=["value"])
+        else:
+            return days
 
     def _get_days_in_top_100(self) -> pd.DataFrame:
         """Gets days in top 100 most likley days"""

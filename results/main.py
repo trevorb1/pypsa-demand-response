@@ -11,6 +11,7 @@ from shed_season import ShedSeason
 from shed_days import ShedDays
 from ramping import Ramping
 from shift_season import ShiftSeason
+from capacity import Capacity
 
 NICE_NAMES = {
     "res": "Residential",
@@ -27,12 +28,15 @@ FIGSIZE = (20, 6)
 class ResultsAccessor:
 
     available_results = [
+        # dr specific metrics
         "peakiness",
         "ramping",
         "shed_season",
         "shed_days",
         "shift_season",
         "shift_days",
+        # ems metrics
+        "capacity",
     ]
 
     def __init__(self, n: str):
@@ -61,6 +65,8 @@ class ResultsAccessor:
             return ShedDays(self.n, YEAR)
         elif input == "shift_season":
             return ShiftSeason(self.n, YEAR)
+        elif input == "capacity":
+            return Capacity(self.n)
         else:
             raise NotImplementedError
 
@@ -87,6 +93,5 @@ if __name__ == "__main__":
 
     ra = ResultsAccessor(NETWORKS + network)
 
-    # print(ra.get_datapoint("shift_days"))
-    ra.plot("shift_season", save="test.png")
-    # ra.plot("shed_days", save="test.png")
+    # print(ra.get_datapoint("capacity"))
+    ra.plot("capacity", save="test.png")

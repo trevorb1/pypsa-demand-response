@@ -16,16 +16,31 @@ class Peakiness(ResultsExtractor):
     def extract_dataframe(self) -> pd.DataFrame:
         return self.net_load
 
-    def extract_datapoint(self, value: Optional[str] = None) -> float:
+    def extract_datapoint(self, value: Optional[str] = None, as_df: Optional[bool] = False) -> float:
         peak_0 = self.net_load.at[0, "Net_Load_MW"]
         peak_100 = self.net_load.at[99, "Net_Load_MW"]
         
+        peak = round(peak_0, 2)
+        rountine = round(peak_100, 2)
+        peakiness = round(peak_0 - peak_100, 2)
+        
+        if as_df:
+            df = pd.DataFrame(
+                [
+                    ["peak", peak],
+                    ["rountine", rountine],
+                    ["peakiness", peakiness],
+                ], 
+                columns=["metric", "value"]
+            )
+            return df
+        
         if value == "peak": 
-            return round(peak_0, 2)
+            return peak
         elif value == "routine":
-            return round(peak_100, 2)
+            return rountine
         else:
-            return round(peak_0 - peak_100, 2)
+            return peakiness
 
     def plot(self, save: Optional[str] = None, **kwargs):
 

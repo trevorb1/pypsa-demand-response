@@ -16,16 +16,31 @@ class Ramping(ResultsExtractor):
     def extract_dataframe(self) -> pd.DataFrame:
         return self.ramp_ts.copy()
 
-    def extract_datapoint(self, value: Optional[str] = None) -> float:
+    def extract_datapoint(self, value: Optional[str] = None, as_df: Optional[bool] = False) -> float:
         peak_0 = self.ramp_ts.at[0, "Absolute 3-hr Ramping"]
         peak_25 = self.ramp_ts.at[24, "Absolute 3-hr Ramping"]
 
+        peak = round(peak_0, 2)
+        rountine = round(peak_25, 2)
+        extreme = round(peak_0 - peak_25, 2)
+        
+        if as_df:
+            df = pd.DataFrame(
+                [
+                    ["peak", peak],
+                    ["rountine", rountine],
+                    ["peakiness", extreme],
+                ], 
+                columns=["metric", "value"]
+            )
+            return df
+
         if value == "peak":
-            return round(peak_0, 2)
+            return peak
         elif value == "routine":
-            return round(peak_25, 2)
+            return rountine
         else:  # extreme
-            return round(peak_0 - peak_25, 2)
+            return extreme
 
     def plot(self, save: Optional[str] = None, **kwargs):
 
