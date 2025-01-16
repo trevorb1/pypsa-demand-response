@@ -31,9 +31,9 @@ class ShiftSeason(ResultsExtractor):
         shift_25 = daily_ramp.copy()
         shift_25 = shift_25.sort_values(
             "Absolute 3-hr Ramping", ascending=False
-        ).reset_index()
+        ).reset_index(drop=True)
         shift_25 = shift_25.iloc[:26, :]
-        shift_25 = shift_25.sort_values("timestep")
+        shift_25 = shift_25.sort_values("timestep").reset_index(drop=True)
         diff = []
         for row in range(len(shift_25)):
             try:
@@ -42,18 +42,18 @@ class ShiftSeason(ResultsExtractor):
                 diff.append(end - start)
             except KeyError:
                 pass
-        shift_25 = shift_25.iloc[:25, :]
+        shift_25 = shift_25.iloc[:25]
         shift_25["diff"] = diff
-        return shift_25
+        return shift_25.reset_index(drop=True)
 
     @staticmethod
     def _get_season(df_times: pd.DataFrame) -> pd.DataFrame:
         """Gets shortest span containing at least 20 days"""
 
         shift_season = df_times.copy()
-        while len(shift_season) > 20:
-            start_diff = shift_season["diff"].iloc[0]
-            end_diff = shift_season["diff"].iloc[-1]
+        while len(shift_season) > 21:
+            start_diff = abs(shift_season["diff"].iloc[0])
+            end_diff = abs(shift_season["diff"].iloc[-1])
             if start_diff > end_diff:
                 shift_season = shift_season.iloc[1:, :]
             else:
@@ -81,6 +81,15 @@ class ShiftSeason(ResultsExtractor):
         end_date = dates[1]
         mid_date = start_date + ((end_date - start_date) / 2)
 
+        top_25 = ramping_sorted.iloc[:25]
+        points_to_plot = [
+            (x, y)
+            for x, y in zip(
+                top_25["timestep"].to_list(),
+                top_25["Absolute 3-hr Ramping"].to_list(),
+            )
+        ]
+
         fig, ax = plt.subplots(figsize=figsize)
         ramping.set_index("timestep").plot(
             ax=ax, xlabel="", color=["tab:blue", "tab:red"]
@@ -106,6 +115,9 @@ class ShiftSeason(ResultsExtractor):
         )
         ax.axvline(x=start_date, color="k", linestyle="-", linewidth=3)
         ax.axvline(x=end_date, color="k", linestyle="-", linewidth=3)
+
+        for point_x, point_y in points_to_plot:
+            ax.scatter(point_x, point_y, color="k", s=5, zorder=9)
 
         if save:
             fig.savefig(save, dpi=400, bbox_inches="tight")

@@ -55,9 +55,9 @@ class ShedSeason(ResultsExtractor):
 
         load_shortest = df_times.copy()
 
-        while len(load_shortest) > 80:
-            start_diff = load_shortest["diff"].iloc[0]
-            end_diff = load_shortest["diff"].iloc[-1]
+        while len(load_shortest) > 81:
+            start_diff = abs(load_shortest["diff"].iloc[0])
+            end_diff = abs(load_shortest["diff"].iloc[-1])
             if start_diff > end_diff:
                 load_shortest = load_shortest.iloc[1:, :]
             else:

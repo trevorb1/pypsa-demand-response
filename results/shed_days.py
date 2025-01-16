@@ -25,8 +25,8 @@ class ShedDays(ResultsExtractor):
         return self._date_in_season(shed_season, days_in_top_100)
 
     def extract_datapoint(self) -> list[datetime]:
-        days_in_top_100 = self._get_days_in_top_100()
-        return days_in_top_100["day"].unique().tolist()
+        df = self.extract_dataframe()
+        return df["day"].unique().tolist()
 
     def _get_days_in_top_100(self) -> pd.DataFrame:
         """Gets days in top 100 most likley days"""
@@ -68,11 +68,11 @@ class ShedDays(ResultsExtractor):
             ["Net_Load_MW", "Top 100 Net Load Hours"]
         ].rename(columns={"Net_Load_MW": "Net Load"})
 
-        dates = self.extract_datapoint()
+        dates = self.shead_season.extract_datapoint()
         start_date = dates[0]
         end_date = dates[1]
 
-        shed_days = self.extract_dataframe()
+        shed_days = self.net_load.iloc[0:99]
         num_shed_days = len(self.extract_datapoint())
         points_to_plot = [
             (x, y)

@@ -26,19 +26,23 @@ FIGSIZE = (20, 6)
 
 class ResultsAccessor:
 
+    available_results = [
+        "peakiness",
+        "ramping",
+        "shed_season",
+        "shed_days",
+        "shift_season",
+        "shift_days",
+    ]
+
     def __init__(self, n: str):
         self.n = pypsa.Network(n)
 
-    @staticmethod
-    def _is_valid_input(input: str) -> bool:
-        if input in [
-            "peakiness",
-            "ramping",
-            "shed_season",
-            "shed_days",
-            "shift_season",
-            "shift_days",
-        ]:
+    def __iter__(self):
+        return self.available_results
+
+    def _is_valid_input(self, input: str) -> bool:
+        if input in self.available_results:
             return True
         else:
             return False
@@ -57,8 +61,6 @@ class ResultsAccessor:
             return ShedDays(self.n, YEAR)
         elif input == "shift_season":
             return ShiftSeason(self.n, YEAR)
-        elif input == "shift_days":
-            raise NotImplementedError
         else:
             raise NotImplementedError
 
@@ -85,6 +87,6 @@ if __name__ == "__main__":
 
     ra = ResultsAccessor(NETWORKS + network)
 
-    # print(ra.get_dataframe("ramping"))
-    # print(ra._get_extractor("ramping").get_daily_max_ramp())
+    # print(ra.get_datapoint("shift_days"))
     ra.plot("shift_season", save="test.png")
+    # ra.plot("shed_days", save="test.png")
