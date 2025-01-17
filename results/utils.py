@@ -17,28 +17,31 @@ def get_sector_slicer(sector: str):
 
 
 def _filter_res():
+    exclusions = ["res-elec", "res-total-elec"]
     cars = [
         y
         for x, y in CARRIER_MAP.items()
-        if x.startswith("res") and x != "res-elec" and not x.endswith("-dr")
+        if x.startswith("res") and x not in exclusions and not x.endswith("-dr")
     ]
     return list(set(cars))
 
 
 def _filter_com():
+    exclusions = ["com-elec", "com-total-elec"]
     cars = [
         y
         for x, y in CARRIER_MAP.items()
-        if x.startswith("com") and x != "com-elec" and not x.endswith("-dr")
+        if x.startswith("com") and x not in exclusions and not x.endswith("-dr")
     ]
     return list(set(cars))
 
 
 def _filter_ind():
+    exclusions = ["ind-elec"]
     cars = [
         y
         for x, y in CARRIER_MAP.items()
-        if x.startswith("ind") and y != "ind-elec" and not x.endswith("-dr")
+        if x.startswith("ind") and x not in exclusions and not x.endswith("-dr")
     ]
     return list(set(cars))
 

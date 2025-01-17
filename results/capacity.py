@@ -3,8 +3,6 @@ from __future__ import annotations
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-from typing import Optional
-from datetime import datetime
 
 from extractor import ResultsExtractor
 from utils import get_sector_slicer
@@ -32,7 +30,7 @@ class Capacity(ResultsExtractor):
         # demand response will have np.inf
         return df.replace(np.inf, np.nan).dropna().groupby(level=0).sum()
 
-    def extract_datapoint(self) -> pd.DataFrame:
+    def extract_datapoint(self, **kwargs) -> pd.DataFrame:
 
         data = []
 

@@ -12,6 +12,7 @@ from shed_days import ShedDays
 from ramping import Ramping
 from shift_season import ShiftSeason
 from capacity import Capacity
+from cost import Cost
 
 NICE_NAMES = {
     "res": "Residential",
@@ -37,6 +38,7 @@ class ResultsAccessor:
         "shift_days",
         # ems metrics
         "capacity",
+        "cost",
     ]
 
     def __init__(self, n: str):
@@ -49,6 +51,7 @@ class ResultsAccessor:
         if input in self.available_results:
             return True
         else:
+            print(f"{input} is not valid. Accepted inputs are {self.available_results}")
             return False
 
     def _get_extractor(self, input: str) -> ResultsExtractor:
@@ -67,6 +70,8 @@ class ResultsAccessor:
             return ShiftSeason(self.n, YEAR)
         elif input == "capacity":
             return Capacity(self.n)
+        elif input == "cost":
+            return Cost(self.n, YEAR)
         else:
             raise NotImplementedError
 
@@ -93,5 +98,5 @@ if __name__ == "__main__":
 
     ra = ResultsAccessor(NETWORKS + network)
 
-    # print(ra.get_datapoint("capacity"))
-    ra.plot("capacity", save="test.png")
+    # print(ra.get_datapoint("cost"))
+    ra.plot("cost", save="test.png")
