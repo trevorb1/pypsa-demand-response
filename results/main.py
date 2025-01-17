@@ -39,6 +39,7 @@ class ResultsAccessor:
         # ems metrics
         "capacity",
         "cost",
+        "dr"
     ]
 
     def __init__(self, n: str):
@@ -72,6 +73,8 @@ class ResultsAccessor:
             return Capacity(self.n)
         elif input == "cost":
             return Cost(self.n, YEAR)
+        elif input == "dr":
+            return DemandResponse(self.n, YEAR)
         else:
             raise NotImplementedError
 

@@ -2,10 +2,8 @@ from __future__ import annotations
 
 import pandas as pd
 import matplotlib.pyplot as plt
-from typing import Optional
 
 from extractor import ResultsExtractor
-from utils import get_sector_slicer
 from constants import CARRIER_MAP
 
 
