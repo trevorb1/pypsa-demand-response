@@ -6,9 +6,12 @@ from typing import Optional
 from datetime import datetime
 from .extractor import ResultsExtractor
 
+import logging
+
+logger = logging.getLogger(__name__)
+
 
 class ShiftSeason(ResultsExtractor):
-
     def __init__(self, n, year=None):
         super().__init__(n, year)
         self.ramp_ts = self.get_daily_max_ramp()
@@ -18,17 +21,20 @@ class ShiftSeason(ResultsExtractor):
         df = self._time_between_peaks(df)
         return self._get_season(df)
 
-    def extract_datapoint(self, as_df: Optional[bool] = False) -> tuple[datetime, datetime] | pd.DataFrame:
+    def extract_datapoint(
+        self, as_df: Optional[bool] = False
+    ) -> tuple[datetime, datetime] | pd.DataFrame:
         df = self.extract_dataframe()
         first_day = df.at[0, "timestep"].to_pydatetime()
         last_day = df.at[len(df) - 1, "timestep"].to_pydatetime()
         if as_df:
+            logger.debug("Returning datapoint shift season dataframe")
             df = pd.DataFrame(
                 [
                     ["first_day", first_day],
                     ["last_day", last_day],
-                ], 
-                columns=["metric", "value"]
+                ],
+                columns=["metric", "value"],
             )
             return df
         else:
@@ -73,14 +79,13 @@ class ShiftSeason(ResultsExtractor):
         return shift_season
 
     def plot(self, save: Optional[str] = None, **kwargs):
-
         fontsize = kwargs.get("fontsize", 12)
         figsize = kwargs.get("figsize", (20, 6))
 
         ramping = self.ramp_ts.sort_values("timestep", ascending=False).copy()
         ramping_sorted = self.ramp_ts
 
-        peak = ramping_sorted.at[0, "Absolute 3-hr Ramping"]
+        # peak = ramping_sorted.at[0, "Absolute 3-hr Ramping"]
         routine = ramping_sorted.at[24, "Absolute 3-hr Ramping"]
 
         ramping = ramping[["timestep", "Absolute 3-hr Ramping"]].copy()

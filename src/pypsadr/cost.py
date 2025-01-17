@@ -6,6 +6,8 @@ import matplotlib.pyplot as plt
 from .extractor import ResultsExtractor
 from .constants import CARRIER_MAP
 
+import logging
+logger = logging.getLogger(__name__)
 
 class Cost(ResultsExtractor):
 

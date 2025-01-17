@@ -7,6 +7,8 @@ from datetime import datetime
 
 from .extractor import ResultsExtractor
 
+import logging
+logger = logging.getLogger(__name__)
 
 class ShedSeason(ResultsExtractor):
 
@@ -24,6 +26,7 @@ class ShedSeason(ResultsExtractor):
         first_day = df.at[0, "timestep"].to_pydatetime()
         last_day = df.at[len(df) - 1, "timestep"].to_pydatetime()
         if as_df:
+            logger.debug("Returning datapoint shed season dataframe")
             df = pd.DataFrame(
                 [
                     ["first_day", first_day],

@@ -8,6 +8,8 @@ from datetime import datetime
 from .extractor import ResultsExtractor
 from .shed_season import ShedSeason
 
+import logging
+logger = logging.getLogger(__name__)
 
 class ShedDays(ResultsExtractor):
     """Shed Days just builds on ShedSeason"""
@@ -31,6 +33,7 @@ class ShedDays(ResultsExtractor):
         days = df["day"].unique().tolist()
 
         if as_df:
+            logger.debug("Returning datapoint shed days dataframe")
             return pd.DataFrame(days, columns=["value"])
         else:
             return days

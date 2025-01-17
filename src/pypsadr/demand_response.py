@@ -6,6 +6,9 @@ import matplotlib.pyplot as plt
 from .extractor import ResultsExtractor
 from .constants import CARRIER_MAP
 
+import logging
+
+logger = logging.getLogger(__name__)
 
 class DemandResponse(ResultsExtractor):
 
@@ -13,12 +16,12 @@ class DemandResponse(ResultsExtractor):
         super().__init__(n, year)
 
     def extract_dataframe(self) -> pd.DataFrame:
+        dr_stores = self.n.stores[self.n.stores.carrier.str.contains("-dr")]
 
-        dr_stores = self.n.stores[self.n.stores.carrier.str.contains("-dr")].index
-
-        if dr_stores:
+        if not dr_stores.empty:
+            stores = dr_stores.index
             return (
-                self.n.stores_t["e"][dr_stores]
+                self.n.stores_t["e"][stores]
                 .abs()
                 .rename(columns=self.n.stores.carrier)
                 .reaname(CARRIER_MAP)
@@ -27,12 +30,14 @@ class DemandResponse(ResultsExtractor):
                 .T.loc[self.year]
             )
         else:
+            logger.info("No demand response data")
             return pd.DataFrame()
 
     def extract_datapoint(self, **kwargs) -> pd.DataFrame:
         df = self.extract_dataframe()
         if df.empty:
-            return df
+            logger.info("No demand response data")
+            return pd.DataFrame(columns=["metric", "value"])
         else:
             return df.sum().to_frame(name="value").reset_index(names="metric")
 

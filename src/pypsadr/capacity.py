@@ -10,6 +10,9 @@ from .constants import (
     CARRIER_MAP,
 )
 
+import logging
+
+logger = logging.getLogger(__name__)
 
 class Capacity(ResultsExtractor):
 
@@ -36,6 +39,8 @@ class Capacity(ResultsExtractor):
 
         for sector in ("power", "residential", "commercial", "transport", "industrial"):
             data.append(self._get_sector_capacity(sector))
+
+        logger.info("No demand response data")
 
         return pd.DataFrame(data, columns=["sector", "p_nom", "p_nom_opt"])
 
@@ -70,8 +75,10 @@ class Capacity(ResultsExtractor):
     def _get_sector_capacity(self, sector: str) -> list[str | float]:
 
         slicer = get_sector_slicer(sector)
+        df = self.extract_dataframe()
 
-        df = self.extract_dataframe().loc[slicer].sum()
+        slicer = [x for x in slicer if x in df.index]
+        df = df.loc[slicer].sum()
 
         return [sector, round(df.p_nom, 1), round(df.p_nom_opt, 1)]
 

@@ -6,6 +6,9 @@ from typing import Optional
 from datetime import datetime
 from .extractor import ResultsExtractor
 
+import logging
+
+logger = logging.getLogger(__name__)
 
 class Ramping(ResultsExtractor):
 
@@ -25,6 +28,7 @@ class Ramping(ResultsExtractor):
         extreme = round(peak_0 - peak_25, 2)
         
         if as_df:
+            logger.debug("Returning datapoint ramping dataframe")
             df = pd.DataFrame(
                 [
                     ["peak", peak],
