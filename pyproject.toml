@@ -1,0 +1,28 @@
+[project]
+name = "pypsa-demand-response"
+version = "0.1.0"
+description = "Package to accompany 'Evaluating the Effectivness of Multi-Sector Demand Response' paper"
+readme = "README.md"
+authors = [
+    { name = "trevorb1", email = "trevor_barnes@sfu.ca" }
+]
+requires-python = ">=3.13"
+dependencies = [
+    "matplotlib>=3.10.0",
+    "numpy>=1.26.4",
+    "pandas>=2.2.3",
+    "pypsa>=0.32.0",
+]
+
+[tool.uv.workspace]
+members = ["pypsadr"]
+
+[project.scripts]
+pypsadr = "src.pypsadr:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/pypsadr"]
