@@ -5,15 +5,15 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from typing import Any
 
-from extractor import ResultsExtractor
-from peakiness import Peakiness
-from shed_season import ShedSeason
-from shed_days import ShedDays
-from ramping import Ramping
-from shift_season import ShiftSeason
-from capacity import Capacity
-from cost import Cost
-from demand_response import DemandResponse
+from .extractor import ResultsExtractor
+from .peakiness import Peakiness
+from .shed_season import ShedSeason
+from .shed_days import ShedDays
+from .ramping import Ramping
+from .shift_season import ShiftSeason
+from .capacity import Capacity
+from .cost import Cost
+from .demand_response import DemandResponse
 
 NICE_NAMES = {
     "res": "Residential",

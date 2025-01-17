@@ -4,9 +4,9 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 
-from extractor import ResultsExtractor
-from utils import get_sector_slicer
-from constants import (
+from .extractor import ResultsExtractor
+from .utils import get_sector_slicer
+from .constants import (
     CARRIER_MAP,
 )
 

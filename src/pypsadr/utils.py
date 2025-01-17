@@ -1,4 +1,4 @@
-from constants import CARRIER_MAP
+from .constants import CARRIER_MAP
 
 
 def get_sector_slicer(sector: str):

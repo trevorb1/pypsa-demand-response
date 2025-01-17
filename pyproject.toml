@@ -1,5 +1,5 @@
 [project]
-name = "pypsa-demand-response"
+name = "pypsadr"
 version = "0.1.0"
 description = "Package to accompany 'Evaluating the Effectivness of Multi-Sector Demand Response' paper"
 readme = "README.md"

@@ -4,38 +4,40 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from typing import Optional
 from datetime import datetime
-from extractor import ResultsExtractor
+from .extractor import ResultsExtractor
 
 
 class Peakiness(ResultsExtractor):
 
-    def __init__(self, n, year = None):
+    def __init__(self, n, year=None):
         super().__init__(n, year)
         self.net_load = self.get_net_load(sorted=True)
 
     def extract_dataframe(self) -> pd.DataFrame:
         return self.net_load
 
-    def extract_datapoint(self, value: Optional[str] = None, as_df: Optional[bool] = False) -> float:
+    def extract_datapoint(
+        self, value: Optional[str] = None, as_df: Optional[bool] = False
+    ) -> float:
         peak_0 = self.net_load.at[0, "Net_Load_MW"]
         peak_100 = self.net_load.at[99, "Net_Load_MW"]
-        
+
         peak = round(peak_0, 2)
         rountine = round(peak_100, 2)
         peakiness = round(peak_0 - peak_100, 2)
-        
+
         if as_df:
             df = pd.DataFrame(
                 [
                     ["peak", peak],
                     ["rountine", rountine],
                     ["peakiness", peakiness],
-                ], 
-                columns=["metric", "value"]
+                ],
+                columns=["metric", "value"],
             )
             return df
-        
-        if value == "peak": 
+
+        if value == "peak":
             return peak
         elif value == "routine":
             return rountine
@@ -86,7 +88,9 @@ class Peakiness(ResultsExtractor):
                 linewidth=1.25,
             ),
         )
-        ax.text(datetime(self.year, 2, 4), peak_0 - 3200, "Peakiness", fontsize=fontsize)
+        ax.text(
+            datetime(self.year, 2, 4), peak_0 - 3200, "Peakiness", fontsize=fontsize
+        )
 
         ax.scatter(date_0, peak_0, color="k", s=25, zorder=9)
         ax.text(date_0, peak_0 + 2000, "Peak", fontsize=fontsize)

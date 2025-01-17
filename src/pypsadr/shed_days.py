@@ -5,8 +5,8 @@ import matplotlib.pyplot as plt
 from typing import Optional
 from datetime import datetime
 
-from extractor import ResultsExtractor
-from shed_season import ShedSeason
+from .extractor import ResultsExtractor
+from .shed_season import ShedSeason
 
 
 class ShedDays(ResultsExtractor):

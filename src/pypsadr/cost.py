@@ -3,8 +3,8 @@ from __future__ import annotations
 import pandas as pd
 import matplotlib.pyplot as plt
 
-from extractor import ResultsExtractor
-from constants import CARRIER_MAP
+from .extractor import ResultsExtractor
+from .constants import CARRIER_MAP
 
 
 class Cost(ResultsExtractor):

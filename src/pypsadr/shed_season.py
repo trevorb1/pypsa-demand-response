@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 from typing import Optional
 from datetime import datetime
 
-from extractor import ResultsExtractor
+from .extractor import ResultsExtractor
 
 
 class ShedSeason(ResultsExtractor):
