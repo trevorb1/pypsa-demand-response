@@ -1,2 +1,2 @@
 # pypsa-demand-response
-Capanion Repository for paper
+Companion Repository for paper
