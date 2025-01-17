@@ -13,6 +13,7 @@ from ramping import Ramping
 from shift_season import ShiftSeason
 from capacity import Capacity
 from cost import Cost
+from demand_response import DemandResponse
 
 NICE_NAMES = {
     "res": "Residential",
@@ -39,7 +40,7 @@ class ResultsAccessor:
         # ems metrics
         "capacity",
         "cost",
-        "dr"
+        "dr",
     ]
 
     def __init__(self, n: str):
