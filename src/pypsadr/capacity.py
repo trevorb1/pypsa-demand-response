@@ -10,14 +10,16 @@ from .constants import (
     CARRIER_MAP,
 )
 
+import logging
+
+logger = logging.getLogger(__name__)
+
 
 class Capacity(ResultsExtractor):
-
     def __init__(self, n, year=None):
         super().__init__(n, year)
 
     def extract_dataframe(self) -> pd.DataFrame:
-
         dfs = []
 
         for c in ["Generator", "Link"]:
@@ -31,16 +33,16 @@ class Capacity(ResultsExtractor):
         return df.replace(np.inf, np.nan).dropna().groupby(level=0).sum()
 
     def extract_datapoint(self, **kwargs) -> pd.DataFrame:
-
         data = []
 
         for sector in ("power", "residential", "commercial", "transport", "industrial"):
             data.append(self._get_sector_capacity(sector))
 
+        logger.info("No demand response data")
+
         return pd.DataFrame(data, columns=["sector", "p_nom", "p_nom_opt"])
 
     def _get_installed_capacity(self, component: str) -> pd.DataFrame:
-
         for x in self.n.iterate_components([component]):
             df = x.df
 
@@ -54,7 +56,6 @@ class Capacity(ResultsExtractor):
         )
 
     def _get_optimial_capacity(self, component: str) -> pd.DataFrame:
-
         for x in self.n.iterate_components([component]):
             df = x.df
 
@@ -68,16 +69,16 @@ class Capacity(ResultsExtractor):
         )
 
     def _get_sector_capacity(self, sector: str) -> list[str | float]:
-
         slicer = get_sector_slicer(sector)
+        df = self.extract_dataframe()
 
-        df = self.extract_dataframe().loc[slicer].sum()
+        slicer = [x for x in slicer if x in df.index]
+        df = df.loc[slicer].sum()
 
         return [sector, round(df.p_nom, 1), round(df.p_nom_opt, 1)]
 
     def plot(self, save=None, **kwargs) -> tuple[plt.figure, plt.axes]:
-
-        fontsize = kwargs.get("fontsize", 12)
+        # fontsize = kwargs.get("fontsize", 12)
 
         # custom figure size
         # figsize = kwargs.get("figsize", (20, 6))
@@ -92,8 +93,8 @@ class Capacity(ResultsExtractor):
         ax = 0
 
         for sector in sectors:
-
             slicer = get_sector_slicer(sector)
+            slicer = [x for x in slicer if x in df.index]
             sector_df = df.loc[slicer]
 
             name_map = {

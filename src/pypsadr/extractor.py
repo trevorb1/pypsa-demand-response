@@ -4,9 +4,12 @@ from typing import Optional, Any
 import matplotlib.pyplot as plt
 import pypsa
 
+import logging
+
+logger = logging.getLogger(__name__)
+
 
 class ResultsExtractor(ABC):
-
     ELEC_CARRIERS = ["res-elec", "com-elec", "ind-elec", "trn-elec-veh"]
 
     def __init__(self, n: pypsa.Network, year: Optional[int] = None):
@@ -54,11 +57,11 @@ class ResultsExtractor(ABC):
         ramp = (
             net_load[["timestep", "Net_Load_MW"]]
             .set_index("timestep")
-            .rename(columns={"Net_Load_MW": f"Absolute 3-hr Ramping"})
+            .rename(columns={"Net_Load_MW": "Absolute 3-hr Ramping"})
             .copy()
         )
         ramp = ramp.diff(periods=3)
-        ramp[f"Absolute 3-hr Ramping"] = ramp[f"Absolute 3-hr Ramping"].abs()
+        ramp["Absolute 3-hr Ramping"] = ramp["Absolute 3-hr Ramping"].abs()
         ramp["Net Load"] = net_load.set_index("timestep")["Net_Load_MW"]
         return ramp.dropna().reset_index(drop=False)
 
