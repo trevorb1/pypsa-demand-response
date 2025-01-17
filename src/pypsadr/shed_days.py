@@ -9,7 +9,9 @@ from .extractor import ResultsExtractor
 from .shed_season import ShedSeason
 
 import logging
+
 logger = logging.getLogger(__name__)
+
 
 class ShedDays(ResultsExtractor):
     """Shed Days just builds on ShedSeason"""
@@ -63,7 +65,6 @@ class ShedDays(ResultsExtractor):
         return shed_days
 
     def plot(self, save: Optional[str] = None, **kwargs) -> tuple[plt.figure, plt.axes]:
-
         fontsize = kwargs.get("fontsize", 12)
         figsize = kwargs.get("figsize", (20, 6))
 

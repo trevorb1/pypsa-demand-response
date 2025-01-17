@@ -14,13 +14,12 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-class Capacity(ResultsExtractor):
 
+class Capacity(ResultsExtractor):
     def __init__(self, n, year=None):
         super().__init__(n, year)
 
     def extract_dataframe(self) -> pd.DataFrame:
-
         dfs = []
 
         for c in ["Generator", "Link"]:
@@ -34,7 +33,6 @@ class Capacity(ResultsExtractor):
         return df.replace(np.inf, np.nan).dropna().groupby(level=0).sum()
 
     def extract_datapoint(self, **kwargs) -> pd.DataFrame:
-
         data = []
 
         for sector in ("power", "residential", "commercial", "transport", "industrial"):
@@ -45,7 +43,6 @@ class Capacity(ResultsExtractor):
         return pd.DataFrame(data, columns=["sector", "p_nom", "p_nom_opt"])
 
     def _get_installed_capacity(self, component: str) -> pd.DataFrame:
-
         for x in self.n.iterate_components([component]):
             df = x.df
 
@@ -59,7 +56,6 @@ class Capacity(ResultsExtractor):
         )
 
     def _get_optimial_capacity(self, component: str) -> pd.DataFrame:
-
         for x in self.n.iterate_components([component]):
             df = x.df
 
@@ -73,7 +69,6 @@ class Capacity(ResultsExtractor):
         )
 
     def _get_sector_capacity(self, sector: str) -> list[str | float]:
-
         slicer = get_sector_slicer(sector)
         df = self.extract_dataframe()
 
@@ -98,7 +93,6 @@ class Capacity(ResultsExtractor):
         ax = 0
 
         for sector in sectors:
-
             slicer = get_sector_slicer(sector)
             slicer = [x for x in slicer if x in df.index]
             sector_df = df.loc[slicer]

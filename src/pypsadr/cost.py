@@ -7,10 +7,11 @@ from .extractor import ResultsExtractor
 from .constants import CARRIER_MAP
 
 import logging
+
 logger = logging.getLogger(__name__)
 
-class Cost(ResultsExtractor):
 
+class Cost(ResultsExtractor):
     def __init__(self, n, year=None):
         super().__init__(n, year)
 
@@ -61,7 +62,6 @@ class Cost(ResultsExtractor):
         return self._filter_carriers_in_sector(df, sector)
 
     def plot(self, save=None, **kwargs) -> tuple[plt.figure, plt.axes]:
-
         fontsize = kwargs.get("fontsize", 12)
         figsize = kwargs.get("figsize", (20, 6))
 
@@ -78,7 +78,6 @@ class Cost(ResultsExtractor):
         ax = 0
 
         for sector in sectors:
-
             slicer = [x for x in df if x.startswith(f"{sector.capitalize()}")]
             sector_df = df[slicer].copy()
             sector_df["Average"] = sector_df.mean(axis=1)

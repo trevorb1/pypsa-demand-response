@@ -10,8 +10,8 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-class Peakiness(ResultsExtractor):
 
+class Peakiness(ResultsExtractor):
     def __init__(self, n, year=None):
         super().__init__(n, year)
         self.net_load = self.get_net_load(sorted=True)
@@ -22,7 +22,6 @@ class Peakiness(ResultsExtractor):
     def extract_datapoint(
         self, value: Optional[str] = None, as_df: Optional[bool] = False
     ) -> float:
-
         peak_0 = self.net_load.at[0, "Net_Load_MW"]
         peak_100 = self.net_load.at[99, "Net_Load_MW"]
 
@@ -53,14 +52,13 @@ class Peakiness(ResultsExtractor):
             return peakiness
 
     def plot(self, save: Optional[str] = None, **kwargs):
-
         fontsize = kwargs.get("fontsize", 12)
         figsize = kwargs.get("figsize", (20, 6))
 
         peak_0 = self.net_load.at[0, "Net_Load_MW"]
         peak_100 = self.net_load.at[99, "Net_Load_MW"]
         date_0 = self.net_load.at[0, "timestep"]
-        date_100 = self.net_load.at[99, "timestep"]
+        # date_100 = self.net_load.at[99, "timestep"]
 
         load_ts = self.get_net_load(sorted=False)
 

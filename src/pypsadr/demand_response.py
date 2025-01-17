@@ -10,8 +10,8 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-class DemandResponse(ResultsExtractor):
 
+class DemandResponse(ResultsExtractor):
     def __init__(self, n, year=None):
         super().__init__(n, year)
 
@@ -42,7 +42,6 @@ class DemandResponse(ResultsExtractor):
             return df.sum().to_frame(name="value").reset_index(names="metric")
 
     def plot(self, save=None, **kwargs) -> tuple[plt.figure, plt.axes]:
-
         fontsize = kwargs.get("fontsize", 12)
         figsize = kwargs.get("figsize", (20, 6))
 
@@ -66,7 +65,6 @@ class DemandResponse(ResultsExtractor):
         ax = 0
 
         for sector in sectors:
-
             slicer = [x for x in df if x.startswith(sector)]
             sector_df = df[slicer].copy()
 

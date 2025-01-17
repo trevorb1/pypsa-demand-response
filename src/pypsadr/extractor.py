@@ -8,8 +8,8 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-class ResultsExtractor(ABC):
 
+class ResultsExtractor(ABC):
     ELEC_CARRIERS = ["res-elec", "com-elec", "ind-elec", "trn-elec-veh"]
 
     def __init__(self, n: pypsa.Network, year: Optional[int] = None):

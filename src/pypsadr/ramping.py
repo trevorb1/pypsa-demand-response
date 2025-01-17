@@ -10,8 +10,8 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-class Ramping(ResultsExtractor):
 
+class Ramping(ResultsExtractor):
     def __init__(self, n, year=None):
         super().__init__(n, year)
         self.ramp_ts = self.get_daily_max_ramp()
@@ -19,14 +19,16 @@ class Ramping(ResultsExtractor):
     def extract_dataframe(self) -> pd.DataFrame:
         return self.ramp_ts.copy()
 
-    def extract_datapoint(self, value: Optional[str] = None, as_df: Optional[bool] = False) -> float:
+    def extract_datapoint(
+        self, value: Optional[str] = None, as_df: Optional[bool] = False
+    ) -> float:
         peak_0 = self.ramp_ts.at[0, "Absolute 3-hr Ramping"]
         peak_25 = self.ramp_ts.at[24, "Absolute 3-hr Ramping"]
 
         peak = round(peak_0, 2)
         rountine = round(peak_25, 2)
         extreme = round(peak_0 - peak_25, 2)
-        
+
         if as_df:
             logger.debug("Returning datapoint ramping dataframe")
             df = pd.DataFrame(
@@ -34,8 +36,8 @@ class Ramping(ResultsExtractor):
                     ["peak", peak],
                     ["rountine", rountine],
                     ["peakiness", extreme],
-                ], 
-                columns=["metric", "value"]
+                ],
+                columns=["metric", "value"],
             )
             return df
 
@@ -47,7 +49,6 @@ class Ramping(ResultsExtractor):
             return extreme
 
     def plot(self, save: Optional[str] = None, **kwargs):
-
         fontsize = kwargs.get("fontsize", 12)
         figsize = kwargs.get("figsize", (20, 6))
 
