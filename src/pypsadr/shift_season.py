@@ -114,11 +114,11 @@ class ShiftSeason(ResultsExtractor):
         ax.margins(x=0.01)
         ax.legend(fontsize=fontsize, loc="lower right")
 
-        ax.text(mid_date, 22000, "Demand Response Shift Season", fontsize=fontsize)
+        ax.text(mid_date, 11000, "Demand Response Shift Season", fontsize=fontsize)
         ax.annotate(
             text="",
-            xy=(start_date, 20000),
-            xytext=(end_date, 20000),
+            xy=(start_date, 10000),
+            xytext=(end_date, 10000),
             arrowprops=dict(
                 arrowstyle="<|-|>",
                 mutation_scale=20,

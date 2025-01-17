@@ -83,8 +83,7 @@ class Capacity(ResultsExtractor):
         return [sector, round(df.p_nom, 1), round(df.p_nom_opt, 1)]
 
     def plot(self, save=None, **kwargs) -> tuple[plt.figure, plt.axes]:
-
-        fontsize = kwargs.get("fontsize", 12)
+        # fontsize = kwargs.get("fontsize", 12)
 
         # custom figure size
         # figsize = kwargs.get("figsize", (20, 6))
@@ -101,6 +100,7 @@ class Capacity(ResultsExtractor):
         for sector in sectors:
 
             slicer = get_sector_slicer(sector)
+            slicer = [x for x in slicer if x in df.index]
             sector_df = df.loc[slicer]
 
             name_map = {

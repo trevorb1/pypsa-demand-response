@@ -47,7 +47,14 @@ def _filter_ind():
 
 
 def _filter_trn():
-    cars = [CARRIER_MAP[x] for x in ["trn-elec-veh", "trn-lpg-veh"]]
+    exclusions = []
+    cars = [
+        y
+        for x, y in CARRIER_MAP.items()
+        if (x.startswith("trn-elec-veh-") | x.startswith("trn-lpg-veh-"))
+        and x not in exclusions
+        and not x.endswith("-dr")
+    ]
     return list(set(cars))
 
 
