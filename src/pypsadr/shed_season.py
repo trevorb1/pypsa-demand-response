@@ -112,7 +112,7 @@ class ShedSeason(ResultsExtractor):
 
         mid_date = dates[0] + ((dates[1] - dates[0]) / 2)
 
-        ax.text(mid_date, 1500, "Demand Response Shed Season", fontsize=fontsize)
+        ax.text(mid_date, 6500, "Demand Response Shed Season", fontsize=fontsize)
         ax.annotate(
             text="",
             xy=(dates[0], 5000),
