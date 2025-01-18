@@ -53,8 +53,8 @@ class ResultsAccessor:
         "dr",
     ]
 
-    def __init__(self, n: str, year: Optional[int] = None):
-        self.n = pypsa.Network(n)
+    def __init__(self, n: pypsa.Network, year: Optional[int] = None):
+        self.n = n
         if year:
             self.year = year
         else:
@@ -114,6 +114,8 @@ class ResultsAccessor:
 
 if __name__ == "__main__":
     network = "er20/western/networks/elec_s70_c4m_ec_lv1.0_1h-TCT_E-G.nc"
+
+    n = pypsa.Network()
 
     ra = ResultsAccessor(NETWORKS + network)
 

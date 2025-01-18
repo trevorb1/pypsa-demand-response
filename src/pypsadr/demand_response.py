@@ -24,7 +24,7 @@ class DemandResponse(ResultsExtractor):
                 self.n.stores_t["e"][stores]
                 .abs()
                 .rename(columns=self.n.stores.carrier)
-                .reaname(CARRIER_MAP)
+                .rename(columns=CARRIER_MAP)
                 .T.groupby(level=0)
                 .sum()
                 .T.loc[self.year]

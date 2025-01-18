@@ -1,5 +1,6 @@
 # project specific 
 data/networks/*
+data/processed/*
 *.nc
 .vscode/*
 
