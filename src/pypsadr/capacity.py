@@ -33,14 +33,21 @@ class Capacity(ResultsExtractor):
         return df.replace(np.inf, np.nan).dropna().groupby(level=0).sum()
 
     def extract_datapoint(self, **kwargs) -> pd.DataFrame:
-        data = []
+        # data = []
 
-        for sector in ("power", "residential", "commercial", "transport", "industrial"):
-            data.append(self._get_sector_capacity(sector))
+        # for sector in ("power", "residential", "commercial", "transport", "industrial"):
+        #     data.append(self._get_sector_capacity(sector))
 
-        logger.info("No demand response data")
+        # logger.info("No demand response data")
 
-        return pd.DataFrame(data, columns=["sector", "p_nom", "p_nom_opt"])
+        # return pd.DataFrame(data, columns=["sector", "p_nom", "p_nom_opt"])
+
+        return (
+            self.extract_dataframe()
+            .reset_index(names="metric")
+            .rename(columns={"p_nom_opt": "value"})
+            .drop(columns=["p_nom"])
+        )
 
     def _get_installed_capacity(self, component: str) -> pd.DataFrame:
         for x in self.n.iterate_components([component]):
