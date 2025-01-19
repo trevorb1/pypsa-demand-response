@@ -29,6 +29,9 @@ class Capacity(ResultsExtractor):
 
         df = pd.concat(dfs).dropna()
 
+        service_capacity = self._get_service_capacity(df)
+        df = pd.concat([df, service_capacity])
+
         # demand response will have np.inf
         return df.replace(np.inf, np.nan).dropna().groupby(level=0).sum()
 
@@ -83,6 +86,16 @@ class Capacity(ResultsExtractor):
         df = df.loc[slicer].sum()
 
         return [sector, round(df.p_nom, 1), round(df.p_nom_opt, 1)]
+
+    def _get_service_capacity(self, df: pd.DataFrame) -> pd.DataFrame:
+        """Creates new service category which is the sum of res and com"""
+
+        service = df[df.index.str.startswith(("Residential", "Commercial"))].copy()
+        # kinda awkward since nice names have already been applied
+        idx = service.index.map(lambda x: x.split(" ")[1:]).map(lambda x: " ".join(x))
+        service.index = idx
+        service = service.groupby(level=0).sum()
+        return service.rename(index={x: f"Service {x}" for x in service.index})
 
     def plot(self, save=None, **kwargs) -> tuple[plt.figure, plt.axes]:
         # fontsize = kwargs.get("fontsize", 12)
