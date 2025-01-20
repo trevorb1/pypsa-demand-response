@@ -37,7 +37,7 @@ def save_results(n: pypsa.Network, scenario: str) -> None:
         fig, _ = ra.plot(result)
 
         dp.to_csv(Path(datapoint_path, f"{result}.csv"), index=False)
-        df.to_csv(Path(dataframe_path, f"{result}.csv"), index=False)
+        df.to_csv(Path(dataframe_path, f"{result}.csv"), index=True)
         fig.savefig(Path(plot_path, f"{result}.png"), dpi=400, bbox_inches="tight")
 
 
@@ -51,7 +51,9 @@ if __name__ == "__main__":
             num_interconnects = sum(
                 1 for item in scenario_dir.iterdir() if item.is_dir()
             )
-            assert num_interconnects == 1
+            assert num_interconnects == 1, (
+                f"{num_interconnects} interconnects in {scenario_dir}"
+            )
             for interconnect_dir in scenario_dir.iterdir():
                 # check correct interconnect name
                 assert interconnect_dir.stem in ["western", "eastern", "texas", "usa"]
@@ -60,7 +62,7 @@ if __name__ == "__main__":
                 num_networks = sum(
                     1 for item in network_dir.iterdir() if item.is_file()
                 )
-                assert num_networks == 1
+                assert num_networks == 1, f"{num_networks} networks in {network_dir}"
                 for network in network_dir.iterdir():
                     # check correct file extension
                     assert network.suffix == ".nc"
