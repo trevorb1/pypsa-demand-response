@@ -1,6 +1,8 @@
 """Extracts relevent results from all model runs
 
-Summarizes the key results from all networks. This data is then used in visualizations. This is quite ugly as all the path handeling, but is what it is.
+Summarizes the key results from all networks. 
+This data is then used in visualizations. 
+Code is quite ugly as all the path handeling, but is what it is.
 """
 
 from pypsadr import ResultsAccessor
