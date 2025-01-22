@@ -59,7 +59,7 @@ CARRIER_MAP = {
     "AC": "Electrical Network",
     "biomass": "Biomass",
     "CCGT": "Natural Gas CCGT",
-    "CCGT-95CCS": "Natural Gas CCGT",
+    "CCGT-95CCS": "Natural Gas CCGT-95CCS",
     "coal": "Coal",
     "geothermal": "Geothermal",
     "hydro": "Hydro",
