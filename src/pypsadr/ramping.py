@@ -35,7 +35,7 @@ class Ramping(ResultsExtractor):
                 [
                     ["peak", peak],
                     ["rountine", rountine],
-                    ["peakiness", extreme],
+                    ["extreme", extreme],
                 ],
                 columns=["metric", "value"],
             )
