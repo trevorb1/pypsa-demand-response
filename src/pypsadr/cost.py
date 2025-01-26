@@ -29,7 +29,7 @@ class Cost(ResultsExtractor):
         dr = self._get_dr_cost()
 
         objective = self.n.objective
-        objective_adjusted = self.n - dr
+        objective_adjusted = objective - dr
 
         obj = pd.DataFrame(
             [
@@ -74,10 +74,14 @@ class Cost(ResultsExtractor):
         """Gets costs incurred from demand response"""
 
         stores = self.n.stores[self.n.stores.index.str.endswith("-dr")]
+
+        if stores.empty:
+            return 0.0
+
         weights = self.n.snapshot_weightings.stores
         mc = stores.marginal_cost_storage
         e = self.n.stores_t["e"][stores.index]
-        return e.mul(mc).mul(weights, axis=1).sum().sum()
+        return e.mul(mc).mul(weights, axis=0).sum().sum()
 
     def plot(self, save=None, **kwargs) -> tuple[plt.figure, plt.axes]:
         fontsize = kwargs.get("fontsize", 12)
