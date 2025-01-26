@@ -17,7 +17,7 @@ class Peakiness(ResultsExtractor):
         self.net_load = self.get_net_load(sorted=True)
 
     def extract_dataframe(self) -> pd.DataFrame:
-        return self.net_load
+        return self.net_load.set_index("timestep")
 
     def extract_datapoint(
         self, value: Optional[str] = None, as_df: Optional[bool] = False

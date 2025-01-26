@@ -26,8 +26,17 @@ class Cost(ResultsExtractor):
         mc = self.extract_dataframe()
         mc = mc.mean().to_frame(name="value").reset_index(names="metric")
 
+        dr = self._get_dr_cost()
+
+        objective = self.n.objective
+        objective_adjusted = objective - dr
+
         obj = pd.DataFrame(
-            [["objective", self.n.objective]], columns=["metric", "value"]
+            [
+                ["objective", objective],
+                ["objective_adj", objective_adjusted],
+            ],
+            columns=["metric", "value"],
         )
 
         return pd.concat([obj, mc]).reset_index(drop=True)
@@ -60,6 +69,19 @@ class Cost(ResultsExtractor):
         df = self._get_marginal_cost()
         df = df[[x for x in df if sector in x and not x.endswith("-dr")]]
         return self._filter_carriers_in_sector(df, sector)
+
+    def _get_dr_cost(self) -> float:
+        """Gets costs incurred from demand response"""
+
+        stores = self.n.stores[self.n.stores.index.str.endswith("-dr")]
+
+        if stores.empty:
+            return 0.0
+
+        weights = self.n.snapshot_weightings.stores
+        mc = stores.marginal_cost_storage
+        e = self.n.stores_t["e"][stores.index]
+        return e.mul(mc).mul(weights, axis=0).sum().sum()
 
     def plot(self, save=None, **kwargs) -> tuple[plt.figure, plt.axes]:
         fontsize = kwargs.get("fontsize", 12)

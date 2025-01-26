@@ -26,17 +26,19 @@ class ShedDays(ResultsExtractor):
             self.shead_season.extract_datapoint()
         )  # type tuple[datetime, datetime]
         days_in_top_100 = self._get_days_in_top_100()
-        return self._date_in_season(shed_season, days_in_top_100)
+        return self._date_in_season(shed_season, days_in_top_100).set_index("timestep")
 
     def extract_datapoint(
         self, as_df: Optional[bool] = False
     ) -> list[datetime] | pd.DataFrame:
-        df = self.extract_dataframe()
+        df = self.extract_dataframe().reset_index()
         days = df["day"].unique().tolist()
 
         if as_df:
             logger.debug("Returning datapoint shed days dataframe")
-            return pd.DataFrame(days, columns=["value"])
+            df = pd.DataFrame(days, columns=["value"])
+            df["metric"] = "day"
+            return df[["metric", "value"]]
         else:
             return days
 

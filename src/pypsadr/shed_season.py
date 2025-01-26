@@ -20,12 +20,12 @@ class ShedSeason(ResultsExtractor):
     def extract_dataframe(self) -> pd.DataFrame:
         df = self.net_load.copy()
         df = self._time_between_peaks(df)
-        return self._get_season(df)
+        return self._get_season(df).set_index("timestep")
 
     def extract_datapoint(
         self, as_df: Optional[bool] = False
     ) -> tuple[datetime, datetime] | pd.DataFrame:
-        df = self.extract_dataframe()
+        df = self.extract_dataframe().reset_index()
         first_day = df.at[0, "timestep"].to_pydatetime()
         last_day = df.at[len(df) - 1, "timestep"].to_pydatetime()
         if as_df:

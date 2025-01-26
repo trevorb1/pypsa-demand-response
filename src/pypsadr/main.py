@@ -115,9 +115,9 @@ class ResultsAccessor:
 if __name__ == "__main__":
     network = "er20/western/networks/elec_s70_c4m_ec_lv1.0_1h-TCT_E-G.nc"
 
-    n = pypsa.Network()
+    n = pypsa.Network(NETWORKS + network)
 
-    ra = ResultsAccessor(NETWORKS + network)
+    ra = ResultsAccessor(n)
 
     ra.get_datapoint("capacity", as_df=True)
     # ra.plot("cost", save="test.png")

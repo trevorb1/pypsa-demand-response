@@ -17,7 +17,7 @@ class Ramping(ResultsExtractor):
         self.ramp_ts = self.get_daily_max_ramp()
 
     def extract_dataframe(self) -> pd.DataFrame:
-        return self.ramp_ts.copy()
+        return self.ramp_ts.set_index("timestep")
 
     def extract_datapoint(
         self, value: Optional[str] = None, as_df: Optional[bool] = False
@@ -35,7 +35,7 @@ class Ramping(ResultsExtractor):
                 [
                     ["peak", peak],
                     ["rountine", rountine],
-                    ["peakiness", extreme],
+                    ["extreme", extreme],
                 ],
                 columns=["metric", "value"],
             )
