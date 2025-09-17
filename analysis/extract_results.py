@@ -1,7 +1,7 @@
 """Extracts relevent results from all model runs
 
-Summarizes the key results from all networks. 
-This data is then used in visualizations. 
+Summarizes the key results from all networks.
+This data is then used in visualizations.
 Code is quite ugly as all the path handeling, but is what it is.
 """
 
@@ -14,17 +14,18 @@ import shutil
 NETWORK_DATA = "./data/networks"
 PROCESSED_DATA = "./data/processed"
 
-def save_results(n: pypsa.Network, scenario: str) -> None:
+
+def save_results(n: pypsa.Network, method: str, scenario: str) -> None:
     # create root scenario folder
-    processed_data = Path(PROCESSED_DATA, scenario)
+    processed_data = Path(PROCESSED_DATA, method, scenario)
     if processed_data.exists():
         shutil.rmtree(processed_data)
     processed_data.mkdir(parents=True)
 
     # directories for individual results
-    datapoint_path = Path(PROCESSED_DATA, scenario, "datapoint")
-    dataframe_path = Path(PROCESSED_DATA, scenario, "dataframe")
-    plot_path = Path(PROCESSED_DATA, scenario, "plot")
+    datapoint_path = Path(PROCESSED_DATA, method, scenario, "datapoint")
+    dataframe_path = Path(PROCESSED_DATA, method, scenario, "dataframe")
+    plot_path = Path(PROCESSED_DATA, method, scenario, "plot")
 
     datapoint_path.mkdir(parents=True)
     dataframe_path.mkdir(parents=True)
@@ -50,6 +51,21 @@ if __name__ == "__main__":
         for scenario_dir in network_data.iterdir():
             scenario = scenario_dir.stem
             if scenario_dir.is_dir():
+                # check only one network file
+                network_dir = Path(scenario_dir, "networks")
+                num_networks = sum(
+                    1 for item in network_dir.iterdir() if item.is_file()
+                )
+                assert num_networks == 1, f"{num_networks} networks in {network_dir}"
+                for network in network_dir.iterdir():
+                    # check correct file extension
+                    assert network.suffix == ".nc"
+                    # generate intermediate results
+                    print(f"reading {str(network)}")
+                    n = pypsa.Network(str(network))
+                    save_results(n, method, scenario)
+
+                """
                 # check only one interconnect
                 num_interconnects = sum(
                     1 for item in scenario_dir.iterdir() if item.is_dir()
@@ -80,3 +96,4 @@ if __name__ == "__main__":
                         print(f"reading {str(network)}")
                         n = pypsa.Network(str(network))
                         save_results(n, scenario)
+                """
