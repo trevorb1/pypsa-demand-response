@@ -1,6 +1,6 @@
 # project specific 
-data/networks/*
-data/processed/*
+data/caiso/*
+data/new_england/*
 *.nc
 .vscode/*
 
