@@ -14,6 +14,7 @@ from pypsadr.shift_season import ShiftSeason
 from pypsadr.capacity import Capacity
 from pypsadr.cost import Cost
 from pypsadr.demand_response import DemandResponse
+from pypsadr.emissions import Emissions
 
 import logging
 
@@ -34,7 +35,6 @@ NICE_NAMES = {
     "trn": "Transportation",
     "ind": "Industrial",
 }
-NETWORKS = "./data/networks/"
 FONTSIZE = 12
 FIGSIZE = (20, 6)
 
@@ -51,6 +51,7 @@ class ResultsAccessor:
         "capacity",
         "cost",
         "dr",
+        "emissions",
     ]
 
     def __init__(self, n: pypsa.Network, year: Optional[int] = None):
@@ -90,6 +91,8 @@ class ResultsAccessor:
             return Cost(self.n, self.year)
         elif input == "dr":
             return DemandResponse(self.n, self.year)
+        elif input == "emissions":
+            return Emissions(self.n, self.year)
         else:
             raise NotImplementedError
 
@@ -113,11 +116,12 @@ class ResultsAccessor:
 
 
 # if __name__ == "__main__":
-#     network = "er20/western/networks/elec_s70_c4m_ec_lv1.0_1h-TCT_E-G.nc"
+#     network = "./data/caiso/raw/mgas/networks/elec_s80_c4m_ec_lv1.0_1h-TCT_E-G.nc"
 
-#     n = pypsa.Network(NETWORKS + network)
+#     n = pypsa.Network(network)
 
 #     ra = ResultsAccessor(n)
 
-#     ra.get_datapoint("capacity", as_df=True)
-# ra.plot("cost", save="test.png")
+#     ra.get_datapoint("emissions", as_df=True)
+#     ra.get_dataframe("emissions")
+#     ra.plot("emissions", save="test.png")

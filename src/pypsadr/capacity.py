@@ -30,21 +30,13 @@ class Capacity(ResultsExtractor):
         df = pd.concat(dfs).dropna()
 
         service_capacity = self._get_service_capacity(df)
-        df = pd.concat([df, service_capacity])
+        transport_capacity = self._get_transport_capacity(df)
+        df = pd.concat([df, service_capacity, transport_capacity])
 
         # demand response will have np.inf
         return df.replace(np.inf, np.nan).dropna().groupby(level=0).sum()
 
     def extract_datapoint(self, **kwargs) -> pd.DataFrame:
-        # data = []
-
-        # for sector in ("power", "residential", "commercial", "transport", "industrial"):
-        #     data.append(self._get_sector_capacity(sector))
-
-        # logger.info("No demand response data")
-
-        # return pd.DataFrame(data, columns=["sector", "p_nom", "p_nom_opt"])
-
         return (
             self.extract_dataframe()
             .reset_index(names="metric")
@@ -96,6 +88,14 @@ class Capacity(ResultsExtractor):
         service.index = idx
         service = service.groupby(level=0).sum()
         return service.rename(index={x: f"Service {x}" for x in service.index})
+
+    def _get_transport_capacity(self, df: pd.DataFrame) -> pd.DataFrame:
+        """Creates new transport category which is the sum of electric vehicle capacity."""
+        transport = df[df.index.str.startswith(("Transport Electric"))].copy()
+        # kinda awkward since nice names have already been applied
+        idx = transport.index.map(lambda x: x.split(" ")[:2]).map(lambda x: " ".join(x))
+        transport.index = idx
+        return transport.groupby(level=0).sum()
 
     def plot(self, save=None, **kwargs) -> tuple[plt.figure, plt.axes]:
         # fontsize = kwargs.get("fontsize", 12)
