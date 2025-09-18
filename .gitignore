@@ -3,6 +3,7 @@ data/caiso/*
 data/new_england/*
 *.nc
 .vscode/*
+logs/*
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
