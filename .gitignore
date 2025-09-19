@@ -4,6 +4,7 @@ data/new_england/*
 *.nc
 .vscode/*
 logs/*
+figures/*
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
