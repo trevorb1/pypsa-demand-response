@@ -21,7 +21,13 @@ class Emissions(ResultsExtractor):
     def extract_datapoint(
         self, value: Optional[str] = None, as_df: Optional[bool] = False
     ) -> float:
-        return self.emissions.sum()
+        value = self.emissions.sum()
+        if as_df:
+            return pd.DataFrame(
+                [["Emissions CO2 T", value.values[0]]],
+                columns=["metric", "value"],
+            )
+        return value
 
     def plot(self, save: Optional[str] = None, **kwargs):
         fontsize = kwargs.get("fontsize", 12)

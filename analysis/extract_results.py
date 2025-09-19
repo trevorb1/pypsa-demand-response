@@ -72,7 +72,7 @@ if __name__ == "__main__":
                 n = pypsa.Network(str(network))
                 save_results(n, save_dir)
 
-    # # Process DR data
+    # Process DR data
     for region in REGIONS:
         for scenario in SCENARIOS:
             scenario_dir = Path(DATA_DIR, region, "raw", scenario)
