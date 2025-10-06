@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 from typing import Any, Optional
 
 from pypsadr.extractor import ResultsExtractor
+from pypsadr.generation import Generation
 from pypsadr.peakiness import Peakiness
 from pypsadr.shed_season import ShedSeason
 from pypsadr.shed_days import ShedDays
@@ -48,6 +49,7 @@ class ResultsAccessor:
         "shed_days",
         "shift_season",
         # ems metrics
+        "generation",
         "capacity",
         "cost",
         "dr",
@@ -85,6 +87,8 @@ class ResultsAccessor:
             return ShedDays(self.n, self.year)
         elif input == "shift_season":
             return ShiftSeason(self.n, self.year)
+        elif input == "generation":
+            return Generation(self.n, self.year)
         elif input == "capacity":
             return Capacity(self.n)
         elif input == "cost":
@@ -115,13 +119,13 @@ class ResultsAccessor:
         return extractor.plot(figsize=figsize, fontsize=fontsize, **kwargs)
 
 
-# if __name__ == "__main__":
-#     network = "./data/caiso/raw/mgas/networks/elec_s80_c4m_ec_lv1.0_1h-TCT_E-G.nc"
+if __name__ == "__main__":
+    network = "./data/caiso/raw/mgas/networks/elec_s80_c4m_ec_lv1.0_1h-TCT_E-G.nc"
 
-#     n = pypsa.Network(network)
+    n = pypsa.Network(network)
 
-#     ra = ResultsAccessor(n)
+    ra = ResultsAccessor(n)
 
-#     ra.get_datapoint("emissions", as_df=True)
-#     ra.get_dataframe("emissions")
-#     ra.plot("emissions", save="test.png")
+    ra.get_datapoint("generation", as_df=True)
+    ra.get_dataframe("generation")
+    ra.plot("generation", save="test.png")
