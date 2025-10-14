@@ -1,6 +1,7 @@
 # project specific 
 data/caiso/*
 data/new_england/*
+data/caiso_cc/*
 *.nc
 .vscode/*
 logs/*
