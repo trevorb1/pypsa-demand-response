@@ -98,3 +98,9 @@ class ResultsExtractor(ABC):
             ]
             name = "Renewable_MW"
         return self.n.generators_t["p"][gens.index].sum(axis=1).to_frame(name=name)
+
+    def get_emissions(self) -> pd.DataFrame:
+        """Gets emissions dataframe"""
+        stores = self.n.stores[self.n.stores.carrier.str.contains("co2")]
+        stores_t = self.n.stores_t["e"][stores.index]
+        return stores_t.max(axis=0).to_frame(name="Emissions_CO2_MT")

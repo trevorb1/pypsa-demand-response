@@ -7,25 +7,40 @@ Code is quite ugly as all the path handeling, but is what it is.
 
 from pypsadr import ResultsAccessor
 import pypsa
-
+import matplotlib.pyplot as plt
 from pathlib import Path
 import shutil
 
-NETWORK_DATA = "./data/networks"
-PROCESSED_DATA = "./data/processed"
+import logging
+
+logging.basicConfig(level=logging.INFO)
+
+DATA_DIR = "./data"
+
+# REGIONS = ["caiso", "new_england"]
+REGIONS = ["caiso_cc"]
+SCENARIOS = ["static", "dynamic"]
+BASELINES = ["lgas", "mgas", "hgas"]
+# BASELINES = ["er0", "er5", "er10"]
 
 
-def save_results(n: pypsa.Network, method: str, scenario: str) -> None:
+def save_results(n: pypsa.Network, save_dir: Path | str) -> None:
+    """Saves results to a directory"""
+    if isinstance(save_dir, str):
+        save_dir = Path(save_dir)
+
     # create root scenario folder
-    processed_data = Path(PROCESSED_DATA, method, scenario)
-    if processed_data.exists():
-        shutil.rmtree(processed_data)
-    processed_data.mkdir(parents=True)
+    save_dir.mkdir(parents=True, exist_ok=True)
+    if save_dir.exists():
+        shutil.rmtree(save_dir)
+    save_dir.mkdir(parents=True)
+
+    logging.info(f"Saving results to {save_dir}")
 
     # directories for individual results
-    datapoint_path = Path(PROCESSED_DATA, method, scenario, "datapoint")
-    dataframe_path = Path(PROCESSED_DATA, method, scenario, "dataframe")
-    plot_path = Path(PROCESSED_DATA, method, scenario, "plot")
+    datapoint_path = Path(save_dir, "datapoint")
+    dataframe_path = Path(save_dir, "dataframe")
+    plot_path = Path(save_dir, "plot")
 
     datapoint_path.mkdir(parents=True)
     dataframe_path.mkdir(parents=True)
@@ -42,58 +57,37 @@ def save_results(n: pypsa.Network, method: str, scenario: str) -> None:
         df.to_csv(Path(dataframe_path, f"{result}.csv"), index=True)
         fig.savefig(Path(plot_path, f"{result}.png"), dpi=400, bbox_inches="tight")
 
+        plt.close()
+
 
 if __name__ == "__main__":
-    network_path = Path(NETWORK_DATA)
+    # Process baseline data without DR
+    for region in REGIONS:
+        for baseline in BASELINES:
+            network_dir = Path(DATA_DIR, region, "raw", baseline, "networks")
+            save_dir = Path(DATA_DIR, region, "processed", baseline)
+            # check only one network file
+            num_networks = sum(1 for item in network_dir.iterdir() if item.is_file())
+            assert num_networks == 1, f"{num_networks} networks in {network_dir}"
+            # save results
+            for network in network_dir.iterdir():
+                n = pypsa.Network(str(network))
+                save_results(n, save_dir)
 
-    for method in ("static", "dynamic"):
-        network_data = Path(network_path, method)
-        for scenario_dir in network_data.iterdir():
-            scenario = scenario_dir.stem
-            if scenario_dir.is_dir():
+    # Process DR data
+    for region in REGIONS:
+        for scenario in SCENARIOS:
+            scenario_dir = Path(DATA_DIR, region, "raw", scenario)
+            for model_run in scenario_dir.iterdir():
+                run_name = model_run.stem
+                network_dir = Path(model_run, "networks")
+                save_dir = Path(DATA_DIR, region, "processed", scenario, run_name)
                 # check only one network file
-                network_dir = Path(scenario_dir, "networks")
                 num_networks = sum(
                     1 for item in network_dir.iterdir() if item.is_file()
                 )
                 assert num_networks == 1, f"{num_networks} networks in {network_dir}"
+                # save results
                 for network in network_dir.iterdir():
-                    # check correct file extension
-                    assert network.suffix == ".nc"
-                    # generate intermediate results
-                    print(f"reading {str(network)}")
                     n = pypsa.Network(str(network))
-                    save_results(n, method, scenario)
-
-                """
-                # check only one interconnect
-                num_interconnects = sum(
-                    1 for item in scenario_dir.iterdir() if item.is_dir()
-                )
-                assert num_interconnects == 1, (
-                    f"{num_interconnects} interconnects in {scenario_dir}"
-                )
-                for interconnect_dir in scenario_dir.iterdir():
-                    # check correct interconnect name
-                    assert interconnect_dir.stem in [
-                        "western",
-                        "eastern",
-                        "texas",
-                        "usa",
-                    ]
-                    # check only one network file
-                    network_dir = Path(interconnect_dir, "networks")
-                    num_networks = sum(
-                        1 for item in network_dir.iterdir() if item.is_file()
-                    )
-                    assert num_networks == 1, (
-                        f"{num_networks} networks in {network_dir}"
-                    )
-                    for network in network_dir.iterdir():
-                        # check correct file extension
-                        assert network.suffix == ".nc"
-                        # generate intermediate results
-                        print(f"reading {str(network)}")
-                        n = pypsa.Network(str(network))
-                        save_results(n, scenario)
-                """
+                    save_results(n, save_dir)

@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 from typing import Any, Optional
 
 from pypsadr.extractor import ResultsExtractor
+from pypsadr.generation import Generation
 from pypsadr.peakiness import Peakiness
 from pypsadr.shed_season import ShedSeason
 from pypsadr.shed_days import ShedDays
@@ -14,12 +15,13 @@ from pypsadr.shift_season import ShiftSeason
 from pypsadr.capacity import Capacity
 from pypsadr.cost import Cost
 from pypsadr.demand_response import DemandResponse
+from pypsadr.emissions import Emissions
 
 import logging
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(
-    filename="pypsadr.log",
+    filename="logs/pypsadr.log",
     encoding="utf-8",
     level=logging.DEBUG,
     filemode="w",
@@ -34,7 +36,6 @@ NICE_NAMES = {
     "trn": "Transportation",
     "ind": "Industrial",
 }
-NETWORKS = "./data/networks/"
 FONTSIZE = 12
 FIGSIZE = (20, 6)
 
@@ -48,9 +49,11 @@ class ResultsAccessor:
         "shed_days",
         "shift_season",
         # ems metrics
+        "generation",
         "capacity",
         "cost",
         "dr",
+        "emissions",
     ]
 
     def __init__(self, n: pypsa.Network, year: Optional[int] = None):
@@ -84,12 +87,16 @@ class ResultsAccessor:
             return ShedDays(self.n, self.year)
         elif input == "shift_season":
             return ShiftSeason(self.n, self.year)
+        elif input == "generation":
+            return Generation(self.n, self.year)
         elif input == "capacity":
             return Capacity(self.n)
         elif input == "cost":
             return Cost(self.n, self.year)
         elif input == "dr":
             return DemandResponse(self.n, self.year)
+        elif input == "emissions":
+            return Emissions(self.n, self.year)
         else:
             raise NotImplementedError
 
@@ -113,11 +120,12 @@ class ResultsAccessor:
 
 
 if __name__ == "__main__":
-    network = "er20/western/networks/elec_s70_c4m_ec_lv1.0_1h-TCT_E-G.nc"
+    network = "./data/caiso/raw/mgas/networks/elec_s80_c4m_ec_lv1.0_1h-TCT_E-G.nc"
 
-    n = pypsa.Network(NETWORKS + network)
+    n = pypsa.Network(network)
 
     ra = ResultsAccessor(n)
 
-    ra.get_datapoint("capacity", as_df=True)
-    # ra.plot("cost", save="test.png")
+    ra.get_datapoint("generation", as_df=True)
+    ra.get_dataframe("generation")
+    ra.plot("generation", save="test.png")

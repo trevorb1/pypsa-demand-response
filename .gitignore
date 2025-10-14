@@ -1,8 +1,11 @@
 # project specific 
 data/caiso/*
 data/new_england/*
+data/caiso_cc/*
 *.nc
 .vscode/*
+logs/*
+figures/*
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
