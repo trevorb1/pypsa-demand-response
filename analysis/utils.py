@@ -8,8 +8,9 @@ from typing import Optional
 SECTORS = ["e", "t", "et"]
 DR_PRICES = ["high", "mid", "low", "vlow"]
 NG_PRICES = ["lgas", "mgas", "hgas"]
-REGIONS = ["caiso", "new_england"]
+REGIONS = ["caiso", "new_england", "caiso_cc"]
 METHODS = ["static", "dynamic"]
+ERS = ["er0", "er5", "er10"]
 
 # Plot fomatting (DO NOT CHANGE)
 SECTOR_NICE_NAMES = {"e": "Electrical", "t": "Thermal", "et": "Electrical\nand Thermal"}
@@ -19,31 +20,45 @@ NAT_GAS_NICE_NAMES = {
     "mgas": "Mid Nat. Gas Cost",
     "lgas": "Low Nat. Gas Cost",
 }
+ER_NICE_NAMES = {"er0": "ER0", "er5": "ER5", "er10": "ER10"}
 
 # Path handling (DO NOT CHANGE)
 DATA_DIR = Path("..", "data")
 
 
 def get_scenario_name(
-    ng_price: str, sector: Optional[str] = None, dr_price: Optional[str] = None
+    scenario: str, sector: Optional[str] = None, dr_price: Optional[str] = None
 ) -> str:
     """Get the scenario name for a given NG price, sector, and DR price"""
-    assert ng_price in NG_PRICES, (
-        f"Invalid NG price: {ng_price}. Expected one of {NG_PRICES}"
-    )
+    if scenario.startswith("er"):
+        dimension = "er"
+    elif scenario.endswith("gas"):
+        dimension = "ng"
+    else:
+        raise ValueError(f"Invalid scenario: {scenario}")
+
+    if dimension == "er":
+        assert scenario in ERS, f"Invalid ER: {scenario}. Expected one of {ERS}"
+    elif dimension == "ng":
+        assert scenario in NG_PRICES, (
+            f"Invalid NG price: {scenario}. Expected one of {NG_PRICES}"
+        )
+    else:
+        raise ValueError(f"Invalid scenario: {scenario}")
+
     if not (sector or dr_price):
-        return ng_price
+        return scenario
     assert sector and dr_price, "Sector and DR price must be provided"
     assert sector in SECTORS, f"Invalid sector: {sector}. Expected one of {SECTORS}"
     assert dr_price in DR_PRICES, (
         f"Invalid DR price: {dr_price}. Expected one of {DR_PRICES}"
     )
-    return f"{sector}-{dr_price}-{ng_price}"
+    return f"{sector}-{dr_price}-{scenario}"
 
 
 def get_datapoint(
     region: str,
-    ng_price: str,
+    scenario: str,
     result: str,
     method: Optional[str] = None,
     sector: Optional[str] = None,
@@ -51,7 +66,7 @@ def get_datapoint(
 ) -> pd.DataFrame:
     """Get the datapoint for a given NG price, sector, and DR price"""
     assert region in REGIONS, f"Invalid region: {region}. Expected one of {REGIONS}"
-    scenario = get_scenario_name(ng_price, sector, dr_price)
+    scenario = get_scenario_name(scenario, sector, dr_price)
 
     if method:
         assert method in METHODS, f"Invalid method: {method}. Expected one of {METHODS}"
@@ -69,7 +84,7 @@ def get_datapoint(
         p = Path(DATA_DIR, region, "processed", scenario, "datapoint", f"{result}.csv")
 
     assert p.exists(), (
-        f"Data point not found for:\nRegion={region}\nNg_Price={ng_price}\nSector={sector}\nDr_Price={dr_price}\nMethod={method}\nResult={result}"
+        f"Data point not found for:\nRegion={region}\nScenario={scenario}\nSector={sector}\nDr_Price={dr_price}\nMethod={method}\nResult={result}"
     )
 
     return pd.read_csv(p, index_col=0)
@@ -77,7 +92,7 @@ def get_datapoint(
 
 def get_dataframe(
     region: str,
-    ng_price: str,
+    scenario: str,
     result: str,
     method: Optional[str] = None,
     sector: Optional[str] = None,
@@ -85,7 +100,7 @@ def get_dataframe(
 ) -> pd.DataFrame:
     """Get the dataframe for a given NG price, sector, and DR price"""
     assert region in REGIONS, f"Invalid region: {region}. Expected one of {REGIONS}"
-    scenario = get_scenario_name(ng_price, sector, dr_price)
+    scenario = get_scenario_name(scenario, sector, dr_price)
 
     if method:
         assert method in METHODS, f"Invalid method: {method}. Expected one of {METHODS}"
@@ -103,7 +118,7 @@ def get_dataframe(
         p = Path(DATA_DIR, region, "processed", scenario, "dataframe", f"{result}.csv")
 
     assert p.exists(), (
-        f"Dataframe not found for:\nRegion={region}\nNg_Price={ng_price}\nSector={sector}\nDr_Price={dr_price}\nMethod={method}\nResult={result}"
+        f"Dataframe not found for:\nRegion={region}\nScenario={scenario}\nSector={sector}\nDr_Price={dr_price}\nMethod={method}\nResult={result}"
     )
 
     return pd.read_csv(p, index_col=0)

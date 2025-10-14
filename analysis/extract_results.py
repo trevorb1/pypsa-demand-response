@@ -17,9 +17,11 @@ logging.basicConfig(level=logging.INFO)
 
 DATA_DIR = "./data"
 
-REGIONS = ["caiso", "new_england"]
+# REGIONS = ["caiso", "new_england"]
+REGIONS = ["caiso_cc"]
 SCENARIOS = ["static", "dynamic"]
 BASELINES = ["lgas", "mgas", "hgas"]
+# BASELINES = ["er0", "er5", "er10"]
 
 
 def save_results(n: pypsa.Network, save_dir: Path | str) -> None:
