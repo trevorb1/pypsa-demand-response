@@ -21,6 +21,7 @@ NAT_GAS_NICE_NAMES = {
     "lgas": "Low Nat. Gas Cost",
 }
 ER_NICE_NAMES = {"er0": "ER0", "er5": "ER5", "er10": "ER10"}
+METHOD_NICE_NAMES = {"static": "Static Prices", "dynamic": "Dynamic Prices"}
 
 # Path handling (DO NOT CHANGE)
 DATA_DIR = Path("..", "data")
@@ -40,7 +41,8 @@ def get_scenario_name(
     if dimension == "er":
         assert scenario in ERS, f"Invalid ER: {scenario}. Expected one of {ERS}"
     elif dimension == "ng":
-        assert scenario in NG_PRICES, (
+        gas_price = scenario.split("-")[-1]
+        assert gas_price in NG_PRICES, (
             f"Invalid NG price: {scenario}. Expected one of {NG_PRICES}"
         )
     else:
@@ -100,7 +102,7 @@ def get_dataframe(
 ) -> pd.DataFrame:
     """Get the dataframe for a given NG price, sector, and DR price"""
     assert region in REGIONS, f"Invalid region: {region}. Expected one of {REGIONS}"
-    scenario = get_scenario_name(scenario, sector, dr_price)
+    # scenario = get_scenario_name(scenario, sector, dr_price)
 
     if method:
         assert method in METHODS, f"Invalid method: {method}. Expected one of {METHODS}"
