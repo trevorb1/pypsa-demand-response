@@ -15,7 +15,7 @@ All data generated for this study is from [PyPSA-USA](https://github.com/PyPSA/p
 
 ## Running Instructions
 
-Download and unzip Zenodo data and copy into `data/<region>/raw`. **Warning:** This is roughly 16GB of uncompressed data for each of the CAISO networks, and 27GB of uncompressed data for the New England network! Once copied, run the data extraction script with the following command to populate the `data/<region>/processed` directory with summary results. 
+Download and unzip Zenodo data and copy into `data/<region>/raw`. **Warning:** This is roughly 94GB of uncompressed data for all the network data! Once copied, run the data extraction script with the following command to populate the `data/<region>/processed` directory with summary results.
 
 ```
 $ uv run analysis/extract_results.py 
@@ -23,3 +23,6 @@ $ uv run analysis/extract_results.py
 
 Next, any notebook in the `analysis/` directory can be run to replicate results. 
 
+## Result Viewing
+
+As it takes a while to read in each netowork to process results, all summarized data and figures are given in the Zenodo deposits under the folder `data/<region>/processed`
