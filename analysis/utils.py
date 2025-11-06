@@ -21,7 +21,10 @@ NAT_GAS_NICE_NAMES = {
     "lgas": "Low Nat. Gas Cost",
 }
 ER_NICE_NAMES = {"er0": "ER0", "er5": "ER5", "er10": "ER10"}
-METHOD_NICE_NAMES = {"static": "Static Prices", "dynamic": "Dynamic Prices"}
+METHOD_NICE_NAMES = {
+    "static": "Carrier Average Price",
+    "dynamic": "Carrier Specific Price",
+}
 
 # Path handling (DO NOT CHANGE)
 DATA_DIR = Path("..", "data")

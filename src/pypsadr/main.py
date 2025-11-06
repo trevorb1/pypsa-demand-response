@@ -126,6 +126,6 @@ if __name__ == "__main__":
 
     ra = ResultsAccessor(n)
 
-    ra.get_datapoint("generation", as_df=True)
-    ra.get_dataframe("generation")
-    ra.plot("generation", save="test.png")
+    ra.get_datapoint("cost", as_df=True)
+    ra.get_dataframe("cost")
+    ra.plot("cost", save="test.png")

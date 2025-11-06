@@ -39,7 +39,15 @@ class Cost(ResultsExtractor):
             columns=["metric", "value"],
         )
 
-        return pd.concat([obj, mc]).reset_index(drop=True)
+        system_costs = pd.DataFrame(
+            [
+                ["capex", self._get_capex()],
+                ["opex", self._get_opex()],
+            ],
+            columns=["metric", "value"],
+        )
+
+        return pd.concat([obj, mc, system_costs]).reset_index(drop=True)
 
     def _get_marginal_cost(self) -> pd.DataFrame:
         """Average marginal costs per carrier"""
@@ -82,6 +90,46 @@ class Cost(ResultsExtractor):
         mc = stores.marginal_cost_storage
         e = self.n.stores_t["e"][stores.index]
         return e.mul(mc).mul(weights, axis=0).sum().sum()
+
+    def _get_capex(self) -> float:
+        """Gets capital expenditures"""
+
+        stats = self.n.statistics()
+
+        gens_and_links = stats.loc[(["Generator", "Link"]), :]
+        return round(gens_and_links["Capital Expenditure"].fillna(0).sum().sum(), 6)
+
+        # gens = self.n.generators.copy()
+        # links = self.n.links.copy()
+
+        # gens["p_nom_new"] = gens["p_nom_opt"] - gens["p_nom"]
+        # links["p_nom_new"] = links["p_nom_opt"] - links["p_nom"]
+
+        # gens_cost = gens["p_nom_new"].mul(gens["capital_cost"]).sum()
+        # links_cost = links["p_nom_new"].mul(links["capital_cost"]).sum()
+
+        # return round(gens_cost + links_cost, 6)
+
+    def _get_opex(self) -> float:
+        """Gets operational expenditures"""
+
+        stats = self.n.statistics()
+
+        gens_and_links = stats.loc[(["Generator", "Link"]), :]
+        return round(gens_and_links["Operational Expenditure"].fillna(0).sum().sum(), 6)
+
+        # opex_gens = self._get_gen_opex()
+
+        # stores = [
+        #     x for x in self.n.stores.index if x.endswith((" lpg", " coal", " oil"))
+        # ]
+        # marginal_cost = get_as_dense(self.n, "Store", "marginal_cost").loc[:, stores]
+        # generation = self.n.stores_t["p"].loc[:, stores]
+        # opex_non_gas = generation.mul(marginal_cost).sum().sum()
+
+        # opex_gas = self._get_nat_gas_opex()
+
+        # return round(opex_gens + opex_non_gas + opex_gas, 6)
 
     def plot(self, save=None, **kwargs) -> tuple[plt.figure, plt.axes]:
         fontsize = kwargs.get("fontsize", 12)
