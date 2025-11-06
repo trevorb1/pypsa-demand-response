@@ -6,8 +6,6 @@ import matplotlib.pyplot as plt
 from .extractor import ResultsExtractor
 from .constants import CARRIER_MAP
 
-from pypsa.descriptors import get_switchable_as_dense as get_as_dense
-
 import logging
 
 logger = logging.getLogger(__name__)
