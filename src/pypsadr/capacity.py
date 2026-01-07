@@ -22,7 +22,7 @@ class Capacity(ResultsExtractor):
     def extract_dataframe(self) -> pd.DataFrame:
         dfs = []
 
-        for c in ["Generator", "Link"]:
+        for c in ["Generator", "Link", "SorageUnit"]:
             installed = self._get_installed_capacity(c)
             optimal = self._get_optimial_capacity(c)
             dfs.append(installed.join(optimal, how="outer").fillna(0))
