@@ -27,6 +27,11 @@ class Capacity(ResultsExtractor):
             optimal = self._get_optimial_capacity(c)
             dfs.append(installed.join(optimal, how="outer").fillna(0))
 
+        # update for battery capacity in MWh as well
+        installed = self._get_installed_battery_capacity()
+        optimal = self._get_optimal_battery_capacity()
+        dfs.append(installed.join(optimal, how="outer").fillna(0))
+
         df = pd.concat(dfs).dropna()
 
         service_capacity = self._get_service_capacity(df)
@@ -69,6 +74,37 @@ class Capacity(ResultsExtractor):
             .sum()
             .to_frame("p_nom_opt")
         )
+
+    def _get_installed_battery_capacity(self) -> pd.DataFrame:
+        
+        df = self.n.storage_units
+        
+        return (
+            df["p_nom"]
+            .mul(df["max_hours"])
+            .rename(index=df.carrier)
+            .rename(index=CARRIER_MAP)
+            .groupby(level=0)
+            .sum()
+            .to_frame("p_nom")
+            .rename(index={"Battery": "Battery_MWh"})
+        )
+        
+    def _get_optimal_battery_capacity(self) -> pd.DataFrame:
+        
+        df = self.n.storage_units
+        
+        return (
+            df["p_nom_opt"]
+            .mul(df["max_hours"])
+            .rename(index=df.carrier)
+            .rename(index=CARRIER_MAP)
+            .groupby(level=0)
+            .sum()
+            .to_frame("p_nom_opt")
+            .rename(index={"Battery": "Battery_MWh"})
+        )
+            
 
     def _get_sector_capacity(self, sector: str) -> list[str | float]:
         slicer = get_sector_slicer(sector)
