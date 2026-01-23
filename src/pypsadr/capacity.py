@@ -76,9 +76,8 @@ class Capacity(ResultsExtractor):
         )
 
     def _get_installed_battery_capacity(self) -> pd.DataFrame:
-        
         df = self.n.storage_units
-        
+
         return (
             df["p_nom"]
             .mul(df["max_hours"])
@@ -89,11 +88,10 @@ class Capacity(ResultsExtractor):
             .to_frame("p_nom")
             .rename(index={"Battery": "Battery_MWh"})
         )
-        
+
     def _get_optimal_battery_capacity(self) -> pd.DataFrame:
-        
         df = self.n.storage_units
-        
+
         return (
             df["p_nom_opt"]
             .mul(df["max_hours"])
@@ -104,7 +102,6 @@ class Capacity(ResultsExtractor):
             .to_frame("p_nom_opt")
             .rename(index={"Battery": "Battery_MWh"})
         )
-            
 
     def _get_sector_capacity(self, sector: str) -> list[str | float]:
         slicer = get_sector_slicer(sector)
