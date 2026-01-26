@@ -90,3 +90,41 @@ if __name__ == "__main__":
                 for network in network_dir.iterdir():
                     n = pypsa.Network(str(network))
                     save_results(n, save_dir)
+
+    # Process sensitivity analysis data
+    for region in REGIONS:
+        # process baseline
+        baseline_dir = Path(DATA_DIR, region, "sensitivity_analysis", "raw", "no_dr")
+        network_dir = Path(baseline_dir, "networks")
+        save_dir = Path(DATA_DIR, region, "sensitivity_analysis", "processed", "no_dr")
+        # check only one network file
+        num_networks = sum(1 for item in network_dir.iterdir() if item.is_file())
+        # save results
+        for network in network_dir.iterdir():
+            n = pypsa.Network(str(network))
+            save_results(n, save_dir)
+
+        # process sensitivity analysis
+        for scenario in SCENARIOS:
+            scenario_dir = Path(
+                DATA_DIR, region, "sensitivity_analysis", "raw", scenario
+            )
+            for model_run in scenario_dir.iterdir():
+                run_name = model_run.stem
+                network_dir = Path(model_run, "networks")
+                save_dir = Path(
+                    DATA_DIR,
+                    region,
+                    "sensitivity_analysis",
+                    "processed",
+                    scenario,
+                    run_name,
+                )
+                # check only one network file
+                num_networks = sum(
+                    1 for item in network_dir.iterdir() if item.is_file()
+                )
+                # save results
+                for network in network_dir.iterdir():
+                    n = pypsa.Network(str(network))
+                    save_results(n, save_dir)

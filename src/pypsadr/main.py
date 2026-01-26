@@ -16,6 +16,7 @@ from pypsadr.capacity import Capacity
 from pypsadr.cost import Cost
 from pypsadr.demand_response import DemandResponse
 from pypsadr.emissions import Emissions
+from pypsadr.net_load import NetLoad
 
 import logging
 
@@ -48,12 +49,13 @@ class ResultsAccessor:
         "shed_season",
         "shed_days",
         "shift_season",
-        # ems metrics
+        # esm metrics
         "generation",
         "capacity",
         "cost",
         "dr",
         "emissions",
+        "net_load",
     ]
 
     def __init__(self, n: pypsa.Network, year: Optional[int] = None):
@@ -97,6 +99,8 @@ class ResultsAccessor:
             return DemandResponse(self.n, self.year)
         elif input == "emissions":
             return Emissions(self.n, self.year)
+        elif input == "net_load":
+            return NetLoad(self.n, self.year)
         else:
             raise NotImplementedError
 
@@ -126,6 +130,6 @@ if __name__ == "__main__":
 
     ra = ResultsAccessor(n)
 
-    ra.get_datapoint("cost", as_df=True)
-    ra.get_dataframe("cost")
-    ra.plot("cost", save="test.png")
+    ra.get_datapoint("net_load", as_df=True)
+    ra.get_dataframe("net_load")
+    ra.plot("net_load", save="test.png")
