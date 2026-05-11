@@ -7,7 +7,7 @@
 
 ## Introduction
 
-This is the companion repository for the paper "Evaluating the Effectivness of Multi-Sector Demand Response".
+This is the companion repository for the paper [Multi-sector demand response for cost optimal energy transitions](https://doi.org/10.1371/journal.pclm.0000918).
 
 ## Data Availability 
 
